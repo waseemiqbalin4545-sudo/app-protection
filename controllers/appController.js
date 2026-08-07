@@ -1,76 +1,241 @@
-const bcrypt = require("bcryptjs");
 const db = require("../config/db");
-const { generateToken } = require("../utils/jwt");
+const { generateApiKey } = require("../utils/apiKey");
 
-exports.login = async (req, res) => {
+/*
+=========================
+Add App
+=========================
+*/
+
+exports.addApp = async (req, res) => {
+
     try {
 
-        const { username, password } = req.body;
+        const {
+            app_name,
+            package_name,
+            version
+        } = req.body;
 
-        if (!username || !password) {
-            return res.status(400).json({
+        if (!app_name || !package_name) {
+
+            return res.json({
                 success: false,
-                message: "Username and Password required"
+                message: "App Name & Package Required"
             });
+
         }
 
-        const result = await db.query(
-            "SELECT * FROM admins WHERE username=$1 LIMIT 1",
-            [username]
+        const check = await db.query(
+
+            "SELECT id FROM apps WHERE package_name=$1",
+
+            [package_name]
+
         );
 
-        if (result.rows.length === 0) {
-            return res.status(401).json({
+        if (check.rows.length > 0) {
+
+            return res.json({
+
                 success: false,
-                message: "Invalid Username"
+
+                message: "Package Already Exists"
+
             });
+
         }
 
-        const admin = result.rows[0];
+        const api_key = generateApiKey();
 
-        let passwordMatch = false;
+        const result = await db.query(
 
-        if (admin.password.startsWith("$2")) {
-            passwordMatch = await bcrypt.compare(password, admin.password);
-        } else {
-            passwordMatch = password === admin.password;
-        }
+            `INSERT INTO apps
+            (app_name,package_name,api_key,version,status)
+            VALUES($1,$2,$3,$4,$5)
+            RETURNING *`,
 
-        if (!passwordMatch) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid Password"
-            });
-        }
+            [
 
-        if (admin.status === false) {
-            return res.status(403).json({
-                success: false,
-                message: "Admin Disabled"
-            });
-        }
+                app_name,
 
-        const token = generateToken(admin);
+                package_name,
+
+                api_key,
+
+                version || "1.0",
+
+                true
+
+            ]
+
+        );
 
         res.json({
+
             success: true,
-            message: "Login Successful",
-            token,
-            admin: {
-                id: admin.id,
-                username: admin.username,
-                role: admin.role
-            }
+
+            message: "App Added",
+
+            data: result.rows[0]
+
         });
 
-    } catch (err) {
+    }
+
+    catch (err) {
 
         console.log(err);
 
         res.status(500).json({
+
             success: false,
+
             message: "Server Error"
+
         });
 
     }
+
+};
+
+
+/*
+=========================
+All Apps
+=========================
+*/
+
+exports.getApps = async (req, res) => {
+
+    try {
+
+        const result = await db.query(
+
+            "SELECT * FROM apps ORDER BY id DESC"
+
+        );
+
+        res.json({
+
+            success: true,
+
+            total: result.rows.length,
+
+            data: result.rows
+
+        });
+
+    }
+
+    catch (err) {
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+};
+
+
+/*
+=========================
+Single App
+=========================
+*/
+
+exports.getApp = async (req, res) => {
+
+    try {
+
+        const result = await db.query(
+
+            "SELECT * FROM apps WHERE id=$1",
+
+            [req.params.id]
+
+        );
+
+        if (result.rows.length == 0) {
+
+            return res.json({
+
+                success: false,
+
+                message: "App Not Found"
+
+            });
+
+        }
+
+        res.json({
+
+            success: true,
+
+            data: result.rows[0]
+
+        });
+
+    }
+
+    catch {
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+};
+
+
+/*
+=========================
+Delete App
+=========================
+*/
+
+exports.deleteApp = async (req, res) => {
+
+    try {
+
+        await db.query(
+
+            "DELETE FROM apps WHERE id=$1",
+
+            [req.params.id]
+
+        );
+
+        res.json({
+
+            success: true,
+
+            message: "App Deleted"
+
+        });
+
+    }
+
+    catch {
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
 };
