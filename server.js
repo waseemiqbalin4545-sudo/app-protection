@@ -1,18 +1,16 @@
 const express = require("express");
-const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
+// JSON Parser
 app.use(express.json());
 
-// Extra CORS Headers
+// Manual CORS
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     if (req.method === "OPTIONS") {
         return res.sendStatus(200);
@@ -43,7 +41,7 @@ app.post("/api/verify", (req, res) => {
         android_id
     } = req.body;
 
-    // API Key Check
+    // API Key
     if (!api_key) {
         return res.json({
             success: false,
@@ -58,22 +56,22 @@ app.post("/api/verify", (req, res) => {
         });
     }
 
-    // Package Check
+    // Package
     if (!package_name) {
         return res.json({
             success: false,
-            message: "Package Missing"
+            message: "Package Name Missing"
         });
     }
 
     if (package_name !== "com.hbl.ml") {
         return res.json({
             success: false,
-            message: "Invalid Package"
+            message: "Invalid Package Name"
         });
     }
 
-    // Android ID Check
+    // Android ID
     if (!android_id) {
         return res.json({
             success: false,
@@ -86,8 +84,8 @@ app.post("/api/verify", (req, res) => {
         success: true,
         message: "Verification Successful",
         data: {
-            package_name,
-            android_id
+            package_name: package_name,
+            android_id: android_id
         }
     });
 
