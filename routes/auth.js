@@ -1,8 +1,8 @@
-router.get("/test", async (req, res) => {
-    req.body = {
-        username: "admin",
-        password: "admin123"
-    };
+const express = require("express");
+const router = express.Router();
 
-    return authController.login(req, res);
-});
+const authController = require("../controllers/authController");
+
+router.post("/login", authController.login);
+
+module.exports = router;
