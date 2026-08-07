@@ -63,10 +63,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server Running On Port ${PORT}`);
 });
-try {
-  const authRoutes = require("./routes/auth");
-  app.use("/api/auth", authRoutes);
-  console.log("✅ Auth routes loaded");
-} catch (err) {
-  console.error("❌ Auth Route Error:", err);
-}
