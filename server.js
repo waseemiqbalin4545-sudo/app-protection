@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const db = require("./config/db");
 
@@ -16,11 +17,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Static files - login.html etc.
-app.use(express.static(__dirname));
+
+// ===============================
+// LOGIN PAGE
+// ===============================
+
+app.get("/login.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "login.html"));
+});
 
 
+// ===============================
 // Database Test
+// ===============================
+
 db.query("SELECT NOW()")
     .then(() => {
         console.log("✅ PostgreSQL Connected");
@@ -30,7 +40,10 @@ db.query("SELECT NOW()")
     });
 
 
+// ===============================
 // Home
+// ===============================
+
 app.get("/", (req, res) => {
     res.json({
         success: true,
@@ -41,7 +54,10 @@ app.get("/", (req, res) => {
 });
 
 
+// ===============================
 // Health
+// ===============================
+
 app.get("/health", (req, res) => {
     res.json({
         success: true,
@@ -50,7 +66,10 @@ app.get("/health", (req, res) => {
 });
 
 
-// Routes
+// ===============================
+// API Routes
+// ===============================
+
 app.use("/api/auth", authRoutes);
 
 app.use("/api/apps", appRoutes);
@@ -62,7 +81,10 @@ app.use("/api/verify", verifyRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 
+// ===============================
 // 404
+// ===============================
+
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -71,7 +93,10 @@ app.use((req, res) => {
 });
 
 
+// ===============================
 // Server
+// ===============================
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
