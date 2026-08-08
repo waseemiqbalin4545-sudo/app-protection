@@ -9,51 +9,55 @@
     <style>
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
 
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6fa;
+            background: #f4f6f9;
             color: #111827;
         }
 
-        /* Sidebar */
+        /* SIDEBAR */
+
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 205px;
+            width: 210px;
             height: 100vh;
             background: #111827;
             color: white;
             padding: 20px 13px;
+            z-index: 1000;
         }
 
-        .logo {
-            font-size: 21px;
+        .brand {
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 35px;
-            padding-left: 10px;
+            padding: 10px;
+            margin-bottom: 25px;
         }
 
-        .logo span {
-            color: #3b82f6;
+        .brand span {
+            color: #60a5fa;
         }
 
         .menu {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            list-style: none;
+        }
+
+        .menu li {
+            margin-bottom: 6px;
         }
 
         .menu a {
+            display: block;
             text-decoration: none;
             color: #d1d5db;
             padding: 12px 14px;
             border-radius: 8px;
-            display: block;
-            font-size: 14px;
         }
 
         .menu a:hover,
@@ -62,40 +66,39 @@
             color: white;
         }
 
-        /* Main */
+        /* MAIN */
+
         .main {
-            margin-left: 205px;
+            margin-left: 210px;
             min-height: 100vh;
         }
 
+        /* TOPBAR */
+
         .topbar {
-            height: 57px;
+            height: 65px;
             background: white;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 22px;
+            padding: 0 25px;
         }
 
-        .topbar-title {
-            font-size: 18px;
+        .page-title {
+            font-size: 20px;
             font-weight: bold;
         }
 
-        .user-area {
+        .admin-info {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .user {
-            font-size: 14px;
-        }
-
-        .avatar {
-            width: 34px;
-            height: 34px;
+        .admin-avatar {
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: #2563eb;
             color: white;
@@ -109,42 +112,45 @@
             border: none;
             background: #ef4444;
             color: white;
-            padding: 9px 16px;
+            padding: 9px 15px;
             border-radius: 7px;
             cursor: pointer;
         }
 
+        /* CONTENT */
+
         .content {
-            padding: 28px;
+            padding: 30px;
         }
 
-        .heading {
-            margin-bottom: 22px;
+        .welcome {
+            margin-bottom: 25px;
         }
 
-        .heading h1 {
-            margin: 0 0 5px;
+        .welcome h1 {
             font-size: 27px;
+            margin-bottom: 6px;
         }
 
-        .heading p {
-            margin: 0;
-            color: #64748b;
+        .welcome p {
+            color: #6b7280;
         }
 
-        /* Add App */
-        .card {
+        /* PANEL */
+
+        .panel {
             background: white;
             border-radius: 12px;
-            padding: 22px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.06);
-            margin-bottom: 22px;
+            margin-top: 22px;
+            padding: 25px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
         }
 
-        .card h2 {
-            margin-top: 0;
-            margin-bottom: 18px;
+        .panel h2 {
+            margin-bottom: 20px;
         }
+
+        /* FORM */
 
         .form-grid {
             display: grid;
@@ -161,7 +167,7 @@
 
         .form-group input {
             width: 100%;
-            padding: 11px 12px;
+            padding: 11px;
             border: 1px solid #d1d5db;
             border-radius: 7px;
             outline: none;
@@ -173,10 +179,10 @@
 
         .add-btn {
             margin-top: 18px;
+            border: none;
             background: #2563eb;
             color: white;
-            border: none;
-            padding: 11px 20px;
+            padding: 11px 18px;
             border-radius: 7px;
             cursor: pointer;
             font-weight: bold;
@@ -186,75 +192,17 @@
             background: #1d4ed8;
         }
 
-        /* Table */
-        .table-wrapper {
-            overflow-x: auto;
+        .add-btn:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 850px;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #475569;
-            font-size: 13px;
-            text-align: left;
-            padding: 13px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        td {
-            padding: 14px 13px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 13px;
-        }
-
-        .api-key {
-            font-family: monospace;
-            background: #f1f5f9;
-            padding: 5px 8px;
-            border-radius: 5px;
-            font-size: 12px;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status.on {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .status.off {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .delete-btn {
-            background: #ef4444;
-            border: none;
-            color: white;
-            padding: 7px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .delete-btn:hover {
-            background: #dc2626;
-        }
+        /* MESSAGE */
 
         .message {
-            padding: 12px;
+            margin-top: 15px;
+            padding: 11px;
             border-radius: 7px;
-            margin-bottom: 15px;
             display: none;
         }
 
@@ -268,51 +216,116 @@
             color: #991b1b;
         }
 
-        .empty {
-            text-align: center;
-            color: #64748b;
-            padding: 30px;
+        /* TABLE */
+
+        .table-container {
+            overflow-x: auto;
         }
 
-        /* Mobile */
-        @media (max-width: 800px) {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            background: #f8fafc;
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+
+        .api-key {
+            font-family: monospace;
+            background: #f3f4f6;
+            padding: 5px 7px;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-on {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-off {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .delete-btn {
+            border: none;
+            background: #ef4444;
+            color: white;
+            padding: 7px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .empty {
+            text-align: center;
+            color: #6b7280;
+            padding: 25px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
 
             .sidebar {
-                width: 70px;
-                padding: 20px 8px;
+                position: fixed;
+                transform: translateX(-100%);
+                transition: 0.25s;
             }
 
-            .logo {
-                font-size: 0;
-                text-align: center;
-            }
-
-            .logo:first-letter {
-                font-size: 20px;
-            }
-
-            .menu a {
-                text-align: center;
-                font-size: 0;
-            }
-
-            .menu a:first-letter {
-                font-size: 18px;
+            .sidebar.open {
+                transform: translateX(0);
             }
 
             .main {
-                margin-left: 70px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
+                margin-left: 0;
             }
 
             .content {
                 padding: 18px;
             }
 
-            .user {
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .admin-name {
                 display: none;
             }
         }
@@ -321,38 +334,70 @@
 
 <body>
 
-<!-- Sidebar -->
-<aside class="sidebar">
+<!-- SIDEBAR -->
 
-    <div class="logo">
-        🛡️ App <span>Protection</span>
+<aside class="sidebar" id="sidebar">
+
+    <div class="brand">
+        🛡 App <span>Protection</span>
     </div>
 
-    <nav class="menu">
-        <a href="/dashboard.html">🏠 Dashboard</a>
-        <a href="/apps.html" class="active">📱 Apps</a>
-        <a href="/devices.html">📟 Devices</a>
-        <a href="/verification.html">🔐 Verification</a>
-        <a href="/settings.html">⚙️ Settings</a>
-    </nav>
+    <ul class="menu">
+
+        <li>
+            <a href="/dashboard.html">
+                🏠 Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="/apps.html" class="active">
+                📱 Apps
+            </a>
+        </li>
+
+        <li>
+            <a href="/devices.html">
+                📲 Devices
+            </a>
+        </li>
+
+        <li>
+            <a href="/verification.html">
+                🔐 Verification
+            </a>
+        </li>
+
+        <li>
+            <a href="/settings.html">
+                ⚙ Settings
+            </a>
+        </li>
+
+    </ul>
 
 </aside>
 
 
-<!-- Main -->
-<main class="main">
+<!-- MAIN -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
 
     <header class="topbar">
 
-        <div class="topbar-title">
+        <div class="page-title">
             Apps
         </div>
 
-        <div class="user-area">
+        <div class="admin-info">
 
-            <span class="user" id="username">admin</span>
+            <div class="admin-name" id="adminName">
+                admin
+            </div>
 
-            <div class="avatar" id="avatar">
+            <div class="admin-avatar" id="avatar">
                 A
             </div>
 
@@ -365,11 +410,15 @@
     </header>
 
 
-    <section class="content">
+    <!-- CONTENT -->
 
-        <div class="heading">
+    <main class="content">
 
-            <h1>Apps</h1>
+        <div class="welcome">
+
+            <h1>
+                Apps
+            </h1>
 
             <p>
                 Manage protected applications.
@@ -378,98 +427,117 @@
         </div>
 
 
-        <!-- Message -->
-        <div id="message" class="message"></div>
+        <!-- ADD APP -->
 
-
-        <!-- Add App -->
-        <div class="card">
+        <div class="panel">
 
             <h2>
                 Add New App
             </h2>
 
-            <div class="form-grid">
+            <form id="addAppForm">
 
-                <div class="form-group">
+                <div class="form-grid">
 
-                    <label>
-                        App Name
-                    </label>
+                    <div class="form-group">
 
-                    <input
-                        type="text"
-                        id="app_name"
-                        placeholder="Example App"
-                    >
+                        <label>
+                            App Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="app_name"
+                            placeholder="Example App"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Package Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="package_name"
+                            placeholder="com.example.app"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Version
+                        </label>
+
+                        <input
+                            type="text"
+                            id="version"
+                            placeholder="1.0"
+                            value="1.0"
+                        >
+
+                    </div>
 
                 </div>
 
 
-                <div class="form-group">
+                <button
+                    type="submit"
+                    class="add-btn"
+                    id="addBtn"
+                >
+                    + Add App
+                </button>
 
-                    <label>
-                        Package Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="package_name"
-                        placeholder="com.example.app"
-                    >
-
-                </div>
+            </form>
 
 
-                <div class="form-group">
-
-                    <label>
-                        Version
-                    </label>
-
-                    <input
-                        type="text"
-                        id="version"
-                        placeholder="1.0"
-                        value="1.0"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <button
-                class="add-btn"
-                onclick="addApp()"
-            >
-                + Add App
-            </button>
+            <div
+                id="message"
+                class="message"
+            ></div>
 
         </div>
 
 
-        <!-- Apps List -->
-        <div class="card">
+        <!-- APP MANAGEMENT -->
+
+        <div class="panel">
 
             <h2>
                 App Management
             </h2>
 
-            <div class="table-wrapper">
+            <div class="table-container">
 
                 <table>
 
                     <thead>
 
                         <tr>
+
                             <th>ID</th>
+
                             <th>App Name</th>
+
                             <th>Package Name</th>
+
                             <th>Version</th>
+
                             <th>API Key</th>
+
                             <th>Status</th>
+
                             <th>Action</th>
+
                         </tr>
 
                     </thead>
@@ -477,9 +545,14 @@
                     <tbody id="appsTable">
 
                         <tr>
-                            <td colspan="7" class="empty">
+
+                            <td
+                                colspan="7"
+                                class="loading"
+                            >
                                 Loading apps...
                             </td>
+
                         </tr>
 
                     </tbody>
@@ -490,115 +563,124 @@
 
         </div>
 
-    </section>
+    </main>
 
-</main>
+</div>
 
 
 <script>
 
-const API = "/api";
+/* ==========================================
+   API URL
+========================================== */
+
+const API_URL = "";
 
 
-// ================================
-// Check Login
-// ================================
+/* ==========================================
+   AUTH CHECK
+========================================== */
 
 const token = localStorage.getItem("token");
 
 if (!token) {
+
     window.location.href = "/login.html";
+
 }
 
 
-// ================================
-// Load Admin
-// ================================
+/* ==========================================
+   ADMIN DATA
+========================================== */
 
-try {
+const adminData = localStorage.getItem("admin");
 
-    const admin = JSON.parse(
-        localStorage.getItem("admin")
-    );
+if (adminData) {
 
-    if (admin) {
+    try {
 
-        document.getElementById("username").textContent =
-            admin.username || "admin";
+        const admin = JSON.parse(adminData);
+
+        const username = admin.username || "Admin";
+
+        document.getElementById("adminName").textContent =
+            username;
 
         document.getElementById("avatar").textContent =
-            (admin.username || "A")
-                .charAt(0)
-                .toUpperCase();
+            username.charAt(0).toUpperCase();
+
+    } catch (e) {
+
+        console.log(e);
 
     }
 
-} catch (e) {
-    console.log(e);
 }
 
 
-// ================================
-// Show Message
-// ================================
+/* ==========================================
+   SHOW MESSAGE
+========================================== */
 
 function showMessage(text, type) {
 
-    const box = document.getElementById("message");
+    const message = document.getElementById("message");
 
-    box.textContent = text;
+    message.textContent = text;
 
-    box.className = "message " + type;
+    message.className =
+        "message " + type;
 
-    box.style.display = "block";
+    message.style.display = "block";
 
-    setTimeout(() => {
-        box.style.display = "none";
-    }, 3000);
 }
 
 
-// ================================
-// Load Apps
-// ================================
+/* ==========================================
+   LOAD APPS
+========================================== */
 
 async function loadApps() {
+
+    const table =
+        document.getElementById("appsTable");
+
+    table.innerHTML = `
+        <tr>
+            <td colspan="7" class="loading">
+                Loading apps...
+            </td>
+        </tr>
+    `;
 
     try {
 
         const response = await fetch(
-            `${API}/apps/all`,
+            API_URL + "/api/apps/all",
             {
                 method: "GET",
 
                 headers: {
-                    "Authorization":
-                        "Bearer " + token
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json"
                 }
             }
         );
 
         const result = await response.json();
 
-        if (!response.ok || !result.success) {
+        console.log("Apps API:", result);
 
-            if (
-                response.status === 401 ||
-                response.status === 403
-            ) {
-                logout();
-                return;
-            }
+
+        if (!response.ok || !result.success) {
 
             throw new Error(
                 result.message || "Unable to load apps"
             );
+
         }
 
-        const table =
-            document.getElementById("appsTable");
-
-        table.innerHTML = "";
 
         if (!result.data || result.data.length === 0) {
 
@@ -611,58 +693,53 @@ async function loadApps() {
             `;
 
             return;
+
         }
+
+
+        table.innerHTML = "";
 
 
         result.data.forEach(app => {
 
-            const row =
-                document.createElement("tr");
+            const status =
+                app.status === true ||
+                app.status === "true"
+                    ? `<span class="status status-on">ON</span>`
+                    : `<span class="status status-off">OFF</span>`;
 
-            const statusClass =
-                app.status ? "on" : "off";
 
-            const statusText =
-                app.status ? "ON" : "OFF";
-
+            const row = document.createElement("tr");
 
             row.innerHTML = `
 
-                <td>${escapeHtml(app.id)}</td>
+                <td>${app.id ?? ""}</td>
 
-                <td>
-                    <strong>
-                        ${escapeHtml(app.app_name)}
-                    </strong>
-                </td>
+                <td>${escapeHtml(app.app_name ?? "")}</td>
 
-                <td>
-                    ${escapeHtml(app.package_name)}
-                </td>
+                <td>${escapeHtml(app.package_name ?? "")}</td>
 
-                <td>
-                    ${escapeHtml(app.version || "-")}
-                </td>
+                <td>${escapeHtml(app.version ?? "")}</td>
 
                 <td>
                     <span class="api-key">
-                        ${escapeHtml(app.api_key || "-")}
+                        ${escapeHtml(app.api_key ?? "")}
                     </span>
                 </td>
 
                 <td>
-                    <span class="status ${statusClass}">
-                        ${statusText}
-                    </span>
+                    ${status}
                 </td>
 
                 <td>
+
                     <button
                         class="delete-btn"
                         onclick="deleteApp(${app.id})"
                     >
                         Delete
                     </button>
+
                 </td>
 
             `;
@@ -671,11 +748,13 @@ async function loadApps() {
 
         });
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(error);
 
-        document.getElementById("appsTable").innerHTML = `
+        table.innerHTML = `
             <tr>
                 <td colspan="7" class="empty">
                     ${escapeHtml(error.message)}
@@ -684,148 +763,189 @@ async function loadApps() {
         `;
 
     }
+
 }
 
 
-// ================================
-// Add App
-// ================================
+/* ==========================================
+   ADD APP
+========================================== */
 
-async function addApp() {
+document
+    .getElementById("addAppForm")
+    .addEventListener("submit", async function(e) {
 
-    const app_name =
-        document.getElementById("app_name").value.trim();
-
-    const package_name =
-        document.getElementById("package_name").value.trim();
-
-    const version =
-        document.getElementById("version").value.trim();
+        e.preventDefault();
 
 
-    if (!app_name || !package_name) {
-
-        showMessage(
-            "App Name & Package Name required",
-            "error"
-        );
-
-        return;
-    }
+        const app_name =
+            document
+                .getElementById("app_name")
+                .value
+                .trim();
 
 
-    try {
+        const package_name =
+            document
+                .getElementById("package_name")
+                .value
+                .trim();
 
-        const response = await fetch(
-            `${API}/apps/add`,
-            {
-                method: "POST",
 
-                headers: {
-                    "Content-Type": "application/json",
+        const version =
+            document
+                .getElementById("version")
+                .value
+                .trim() || "1.0";
 
-                    "Authorization":
-                        "Bearer " + token
-                },
 
-                body: JSON.stringify({
-                    app_name,
-                    package_name,
-                    version: version || "1.0"
-                })
+        const button =
+            document.getElementById("addBtn");
+
+
+        button.disabled = true;
+
+        button.textContent = "Adding...";
+
+
+        try {
+
+            const response = await fetch(
+                API_URL + "/api/apps/add",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        app_name,
+                        package_name,
+                        version
+
+                    })
+
+                }
+            );
+
+
+            const result =
+                await response.json();
+
+
+            console.log("Add App API:", result);
+
+
+            if (!response.ok || !result.success) {
+
+                throw new Error(
+                    result.message || "App could not be added"
+                );
+
             }
-        );
 
-
-        const result = await response.json();
-
-
-        if (!response.ok || !result.success) {
-
-            if (
-                response.status === 401 ||
-                response.status === 403
-            ) {
-                logout();
-                return;
-            }
 
             showMessage(
-                result.message || "Failed to add app",
+                "App Added Successfully",
+                "success"
+            );
+
+
+            document
+                .getElementById("addAppForm")
+                .reset();
+
+
+            document
+                .getElementById("version")
+                .value = "1.0";
+
+
+            await loadApps();
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                error.message,
                 "error"
             );
 
-            return;
         }
 
+        finally {
 
-        showMessage(
-            "App Added Successfully",
-            "success"
-        );
+            button.disabled = false;
 
+            button.textContent = "+ Add App";
 
-        document.getElementById("app_name").value = "";
-        document.getElementById("package_name").value = "";
-        document.getElementById("version").value = "1.0";
+        }
 
-
-        loadApps();
-
-    } catch (error) {
-
-        console.error(error);
-
-        showMessage(
-            "Server connection error",
-            "error"
-        );
-
-    }
-}
+    });
 
 
-// ================================
-// Delete App
-// ================================
+/* ==========================================
+   DELETE APP
+========================================== */
 
 async function deleteApp(id) {
 
-    if (
-        !confirm(
-            "Are you sure you want to delete this app?"
-        )
-    ) {
+    if (!confirm(
+        "Are you sure you want to delete this app?"
+    )) {
+
         return;
+
     }
 
 
     try {
 
         const response = await fetch(
-            `${API}/apps/${id}`,
+
+            API_URL + "/api/apps/" + id,
+
             {
+
                 method: "DELETE",
 
                 headers: {
+
                     "Authorization":
-                        "Bearer " + token
+                        "Bearer " + token,
+
+                    "Content-Type":
+                        "application/json"
+
                 }
+
             }
+
         );
 
 
-        const result = await response.json();
+        const result =
+            await response.json();
 
 
         if (!response.ok || !result.success) {
 
-            showMessage(
-                result.message || "Delete failed",
-                "error"
+            throw new Error(
+                result.message || "Delete failed"
             );
 
-            return;
         }
 
 
@@ -837,51 +957,62 @@ async function deleteApp(id) {
 
         loadApps();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(error);
 
         showMessage(
-            "Server connection error",
+            error.message,
             "error"
         );
 
     }
+
 }
 
 
-// ================================
-// Logout
-// ================================
+/* ==========================================
+   HTML ESCAPE
+========================================== */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* ==========================================
+   LOGOUT
+========================================== */
 
 function logout() {
 
     localStorage.removeItem("token");
+
     localStorage.removeItem("admin");
 
     window.location.href =
         "/login.html";
+
 }
 
 
-// ================================
-// HTML Escape
-// ================================
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-
-// ================================
-// Start
-// ================================
+/* ==========================================
+   LOAD
+========================================== */
 
 loadApps();
 
