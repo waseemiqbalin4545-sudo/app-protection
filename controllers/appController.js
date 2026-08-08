@@ -2,9 +2,11 @@ const db = require("../config/db");
 const { generateApiKey } = require("../utils/apiKey");
 
 
-// =====================================================
-// ADD APP
-// =====================================================
+/*
+========================================
+ADD APP
+========================================
+*/
 
 exports.addApp = async (req, res) => {
 
@@ -47,12 +49,18 @@ exports.addApp = async (req, res) => {
 
 
         const result = await db.query(
-
-            `INSERT INTO apps
-            (app_name, package_name, api_key, version, status)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING *`,
-
+            `
+            INSERT INTO apps
+            (
+                app_name,
+                package_name,
+                api_key,
+                version,
+                status
+            )
+            VALUES($1,$2,$3,$4,$5)
+            RETURNING *
+            `,
             [
                 app_name,
                 package_name,
@@ -60,13 +68,13 @@ exports.addApp = async (req, res) => {
                 version || "1.0",
                 true
             ]
-
         );
 
 
         res.json({
 
             success: true,
+
             message: "App Added",
 
             data: result.rows[0]
@@ -82,6 +90,7 @@ exports.addApp = async (req, res) => {
         res.status(500).json({
 
             success: false,
+
             message: "Server Error"
 
         });
@@ -92,33 +101,27 @@ exports.addApp = async (req, res) => {
 
 
 
-// =====================================================
-// GET ALL APPS
-// =====================================================
+/*
+========================================
+GET ALL APPS
+========================================
+*/
 
 exports.getApps = async (req, res) => {
 
     try {
 
         const result = await db.query(
-
-            `SELECT
-                id,
-                app_name,
-                package_name,
-                api_key,
-                version,
-                status
-             FROM apps
-             ORDER BY id DESC`
-
+            "SELECT * FROM apps ORDER BY id DESC"
         );
 
 
         res.json({
 
             success: true,
+
             total: result.rows.length,
+
             data: result.rows
 
         });
@@ -132,6 +135,7 @@ exports.getApps = async (req, res) => {
         res.status(500).json({
 
             success: false,
+
             message: "Server Error"
 
         });
@@ -142,20 +146,19 @@ exports.getApps = async (req, res) => {
 
 
 
-// =====================================================
-// GET SINGLE APP
-// =====================================================
+/*
+========================================
+GET SINGLE APP
+========================================
+*/
 
 exports.getApp = async (req, res) => {
 
     try {
 
         const result = await db.query(
-
             "SELECT * FROM apps WHERE id=$1",
-
             [req.params.id]
-
         );
 
 
@@ -164,6 +167,7 @@ exports.getApp = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
+
                 message: "App Not Found"
 
             });
@@ -174,6 +178,7 @@ exports.getApp = async (req, res) => {
         res.json({
 
             success: true,
+
             data: result.rows[0]
 
         });
@@ -187,6 +192,7 @@ exports.getApp = async (req, res) => {
         res.status(500).json({
 
             success: false,
+
             message: "Server Error"
 
         });
@@ -197,9 +203,11 @@ exports.getApp = async (req, res) => {
 
 
 
-// =====================================================
-// EDIT APP
-// =====================================================
+/*
+========================================
+UPDATE APP
+========================================
+*/
 
 exports.updateApp = async (req, res) => {
 
@@ -212,41 +220,45 @@ exports.updateApp = async (req, res) => {
         } = req.body;
 
 
+        const id = req.params.id;
+
+
         if (!app_name || !package_name) {
 
             return res.status(400).json({
 
                 success: false,
-                message: "App Name & Package Required"
+
+                message:
+                    "App Name & Package Name Required"
 
             });
 
         }
 
 
-        // Check package name belongs to another app
-
-        const check = await db.query(
-
-            `SELECT id
-             FROM apps
-             WHERE package_name=$1
-             AND id<>$2`,
-
+        const existing = await db.query(
+            `
+            SELECT id
+            FROM apps
+            WHERE package_name=$1
+            AND id != $2
+            `,
             [
                 package_name,
-                req.params.id
+                id
             ]
-
         );
 
 
-        if (check.rows.length > 0) {
+        if (existing.rows.length > 0) {
 
             return res.status(409).json({
 
                 success: false,
-                message: "Package Already Exists"
+
+                message:
+                    "Package Already Exists"
 
             });
 
@@ -254,22 +266,21 @@ exports.updateApp = async (req, res) => {
 
 
         const result = await db.query(
-
-            `UPDATE apps
-             SET
+            `
+            UPDATE apps
+            SET
                 app_name=$1,
                 package_name=$2,
                 version=$3
-             WHERE id=$4
-             RETURNING *`,
-
+            WHERE id=$4
+            RETURNING *
+            `,
             [
                 app_name,
                 package_name,
                 version || "1.0",
-                req.params.id
+                id
             ]
-
         );
 
 
@@ -278,6 +289,7 @@ exports.updateApp = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
+
                 message: "App Not Found"
 
             });
@@ -288,7 +300,9 @@ exports.updateApp = async (req, res) => {
         res.json({
 
             success: true,
-            message: "App Updated Successfully",
+
+            message: "App Updated",
+
             data: result.rows[0]
 
         });
@@ -302,6 +316,7 @@ exports.updateApp = async (req, res) => {
         res.status(500).json({
 
             success: false,
+
             message: "Server Error"
 
         });
@@ -312,23 +327,33 @@ exports.updateApp = async (req, res) => {
 
 
 
-// =====================================================
-// ON / OFF STATUS
-// =====================================================
+/*
+========================================
+ON / OFF STATUS
+========================================
+*/
 
 exports.updateStatus = async (req, res) => {
 
     try {
 
-        const { status } = req.body;
+        const id = req.params.id;
+
+        const {
+            status
+        } = req.body;
 
 
-        if (typeof status !== "boolean") {
+        if (
+            typeof status !== "boolean"
+        ) {
 
             return res.status(400).json({
 
                 success: false,
-                message: "Status must be true or false"
+
+                message:
+                    "Status must be true or false"
 
             });
 
@@ -336,17 +361,16 @@ exports.updateStatus = async (req, res) => {
 
 
         const result = await db.query(
-
-            `UPDATE apps
-             SET status=$1
-             WHERE id=$2
-             RETURNING *`,
-
+            `
+            UPDATE apps
+            SET status=$1
+            WHERE id=$2
+            RETURNING *
+            `,
             [
                 status,
-                req.params.id
+                id
             ]
-
         );
 
 
@@ -355,6 +379,7 @@ exports.updateStatus = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
+
                 message: "App Not Found"
 
             });
@@ -366,9 +391,10 @@ exports.updateStatus = async (req, res) => {
 
             success: true,
 
-            message: status
-                ? "App Enabled"
-                : "App Disabled",
+            message:
+                status
+                    ? "App Enabled"
+                    : "App Disabled",
 
             data: result.rows[0]
 
@@ -383,6 +409,7 @@ exports.updateStatus = async (req, res) => {
         res.status(500).json({
 
             success: false,
+
             message: "Server Error"
 
         });
@@ -393,20 +420,19 @@ exports.updateStatus = async (req, res) => {
 
 
 
-// =====================================================
-// DELETE APP
-// =====================================================
+/*
+========================================
+DELETE APP
+========================================
+*/
 
 exports.deleteApp = async (req, res) => {
 
     try {
 
         const result = await db.query(
-
-            "DELETE FROM apps WHERE id=$1 RETURNING id",
-
+            "DELETE FROM apps WHERE id=$1 RETURNING *",
             [req.params.id]
-
         );
 
 
@@ -415,6 +441,7 @@ exports.deleteApp = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
+
                 message: "App Not Found"
 
             });
@@ -425,7 +452,10 @@ exports.deleteApp = async (req, res) => {
         res.json({
 
             success: true,
-            message: "App Deleted"
+
+            message: "App Deleted",
+
+            data: result.rows[0]
 
         });
 
@@ -438,6 +468,7 @@ exports.deleteApp = async (req, res) => {
         res.status(500).json({
 
             success: false,
+
             message: "Server Error"
 
         });
