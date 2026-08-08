@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Verification - App Protection</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+    color:#111827;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:210px;
+    height:100vh;
+    background:#111827;
+    color:white;
+    padding:20px 12px;
+}
+
+.logo{
+    font-size:20px;
+    font-weight:bold;
+    padding:10px;
+    margin-bottom:25px;
+}
+
+.logo span{
+    color:#60a5fa;
+}
+
+.menu a{
+    display:block;
+    color:#d1d5db;
+    text-decoration:none;
+    padding:12px 14px;
+    border-radius:8px;
+    margin-bottom:6px;
+}
+
+.menu a:hover,
+.menu a.active{
+    background:#2563eb;
+    color:white;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:210px;
+    min-height:100vh;
+}
+
+/* TOPBAR */
+
+.topbar{
+    height:65px;
+    background:white;
+    border-bottom:1px solid #e5e7eb;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 25px;
+}
+
+.page-title{
+    font-size:20px;
+    font-weight:bold;
+}
+
+.top-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#2563eb;
+    color:white;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-weight:bold;
+}
+
+.logout{
+    border:0;
+    background:#ef4444;
+    color:white;
+    padding:9px 15px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+/* CONTENT */
+
+.content{
+    padding:28px;
+}
+
+h1{
+    font-size:27px;
+    margin-bottom:5px;
+}
+
+.subtitle{
+    color:#64748b;
+    margin-bottom:25px;
+}
+
+/* CARD */
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:22px;
+    margin-bottom:20px;
+    box-shadow:0 3px 15px rgba(0,0,0,.06);
+}
+
+.card h2{
+    margin-bottom:18px;
+}
+
+/* FORM */
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:15px;
+}
+
+label{
+    display:block;
+    font-size:13px;
+    font-weight:bold;
+    margin-bottom:7px;
+    color:#374151;
+}
+
+input,
+select{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    outline:none;
+    background:white;
+}
+
+input:focus,
+select:focus{
+    border-color:#2563eb;
+}
+
+/* BUTTON */
+
+.btn{
+    border:0;
+    padding:10px 15px;
+    border-radius:7px;
+    color:white;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.btn-blue{
+    background:#2563eb;
+}
+
+.btn-blue:hover{
+    background:#1d4ed8;
+}
+
+.btn-green{
+    background:#16a34a;
+}
+
+.btn-red{
+    background:#ef4444;
+}
+
+.btn-gray{
+    background:#64748b;
+}
+
+/* GENERATE */
+
+.generate-area{
+    margin-top:18px;
+}
+
+.generated-code{
+    margin-top:15px;
+    padding:14px;
+
+    background:#f8fafc;
+    border:1px dashed #94a3b8;
+
+    border-radius:8px;
+
+    display:none;
+}
+
+.generated-code strong{
+    font-size:20px;
+    letter-spacing:2px;
+}
+
+/* MESSAGE */
+
+.message{
+    display:none;
+    padding:12px;
+    border-radius:7px;
+    margin-bottom:18px;
+}
+
+.success{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.error{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+/* TABLE */
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:900px;
+}
+
+th{
+    text-align:left;
+    background:#f8fafc;
+    padding:13px;
+    color:#475569;
+    font-size:13px;
+}
+
+td{
+    padding:13px;
+    border-top:1px solid #e5e7eb;
+    font-size:13px;
+}
+
+.badge{
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.badge-active{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.badge-used{
+    background:#dbeafe;
+    color:#1e40af;
+}
+
+.badge-expired{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.badge-disabled{
+    background:#e5e7eb;
+    color:#374151;
+}
+
+.empty{
+    text-align:center;
+    padding:35px;
+    color:#64748b;
+}
+
+.loading{
+    text-align:center;
+    padding:35px;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+    .sidebar{
+        width:170px;
+    }
+
+    .main{
+        margin-left:170px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+}
+
+@media(max-width:650px){
+
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+
+    .main{
+        margin-left:0;
+    }
+
+    .menu{
+        display:flex;
+        overflow-x:auto;
+    }
+
+    .menu a{
+        white-space:nowrap;
+    }
+
+    .content{
+        padding:15px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .topbar{
+        padding:0 15px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div class="logo">
+        🛡️ App <span>Protection</span>
+    </div>
+
+    <div class="menu">
+
+        <a href="/dashboard.html">
+            🏠 Dashboard
+        </a>
+
+        <a href="/apps.html">
+            📱 Apps
+        </a>
+
+        <a href="/devices.html">
+            📟 Devices
+        </a>
+
+        <a href="/verification.html"
+           class="active">
+            🔐 Verification
+        </a>
+
+        <a href="/settings.html">
+            ⚙️ Settings
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="page-title">
+            Verification
+        </div>
+
+        <div class="top-right">
+
+            <span id="username">
+                admin
+            </span>
+
+            <div class="avatar"
+                 id="avatar">
+                A
+            </div>
+
+            <button
+                class="logout"
+                onclick="logout()">
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTENT -->
+
+    <div class="content">
+
+        <h1>
+            Verification Codes
+        </h1>
+
+        <div class="subtitle">
+            Generate and manage application verification codes.
+        </div>
+
+
+        <div id="message"
+             class="message">
+        </div>
+
+
+        <!-- GENERATE -->
+
+        <div class="card">
+
+            <h2>
+                Generate Verification Code
+            </h2>
+
+
+            <div class="form-grid">
+
+
+                <div>
+
+                    <label>
+                        Select App
+                    </label>
+
+                    <select id="appSelect">
+
+                        <option value="">
+                            Loading apps...
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Code Type
+                    </label>
+
+                    <select id="codeType">
+
+                        <option value="random">
+                            Random Code
+                        </option>
+
+                        <option value="custom">
+                            Custom Code
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Expiry Hours
+                    </label>
+
+                    <input
+                        type="number"
+                        id="hours"
+                        value="24"
+                        min="1"
+                        placeholder="24">
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="customBox"
+                style="display:none;margin-top:15px;">
+
+                <label>
+                    Custom Code
+                </label>
+
+                <input
+                    type="text"
+                    id="customCode"
+                    placeholder="Enter custom code">
+
+            </div>
+
+
+            <div class="generate-area">
+
+                <button
+                    class="btn btn-blue"
+                    onclick="generateCode()">
+
+                    🔐 Generate Code
+
+                </button>
+
+            </div>
+
+
+            <div
+                id="generatedCode"
+                class="generated-code">
+
+                Generated Code:
+
+                <strong id="newCode">
+                    -
+                </strong>
+
+                <button
+                    class="btn btn-gray"
+                    onclick="copyCode()"
+                    style="margin-left:10px;">
+
+                    Copy
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- CODES -->
+
+        <div class="card">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:18px;
+            ">
+
+                <h2>
+                    Code History
+                </h2>
+
+                <button
+                    class="btn btn-gray"
+                    onclick="loadCodes()">
+
+                    🔄 Refresh
+
+                </button>
+
+            </div>
+
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>Code</th>
+
+                            <th>App</th>
+
+                            <th>Created</th>
+
+                            <th>Expiry</th>
+
+                            <th>Status</th>
+
+                            <th>Used At</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="codeTable">
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="loading">
+
+                                Loading...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+/*
+====================================
+API
+====================================
+*/
+
+const API = "/api";
+
+let token =
+    localStorage.getItem("token");
+
+
+/*
+====================================
+AUTH
+====================================
+*/
+
+if(!token){
+
+    window.location.href =
+        "/login.html";
+
+}
+
+
+/*
+====================================
+ADMIN
+====================================
+*/
+
+try{
+
+    const admin =
+        JSON.parse(
+            localStorage.getItem("admin") || "{}"
+        );
+
+    if(admin.username){
+
+        document.getElementById(
+            "username"
+        ).textContent =
+            admin.username;
+
+        document.getElementById(
+            "avatar"
+        ).textContent =
+            admin.username
+                .charAt(0)
+                .toUpperCase();
+
+    }
+
+}catch(e){}
+
+
+/*
+====================================
+API REQUEST
+====================================
+*/
+
+async function apiRequest(
+    url,
+    options={}
+){
+
+    options.headers = {
+
+        ...(options.headers || {}),
+
+        "Authorization":
+            "Bearer " + token,
+
+        "Content-Type":
+            "application/json"
+
+    };
+
+
+    const response =
+        await fetch(
+            API + url,
+            options
+        );
+
+
+    if(response.status === 401){
+
+        logout();
+
+        return null;
+
+    }
+
+
+    return await response.json();
+
+}
+
+
+/*
+====================================
+MESSAGE
+====================================
+*/
+
+function showMessage(
+    text,
+    success=true
+){
+
+    const box =
+        document.getElementById(
+            "message"
+        );
+
+    box.textContent = text;
+
+    box.className =
+        "message " +
+        (success
+            ? "success"
+            : "error");
+
+    box.style.display =
+        "block";
+
+
+    setTimeout(()=>{
+
+        box.style.display =
+            "none";
+
+    },3000);
+
+}
+
+
+/*
+====================================
+CODE TYPE
+====================================
+*/
+
+document
+    .getElementById("codeType")
+    .addEventListener(
+        "change",
+        function(){
+
+            document
+                .getElementById(
+                    "customBox"
+                )
+                .style.display =
+                this.value === "custom"
+                    ? "block"
+                    : "none";
+
+        }
+    );
+
+
+/*
+====================================
+LOAD APPS
+====================================
+*/
+
+async function loadApps(){
+
+    try{
+
+        const result =
+            await apiRequest(
+                "/apps/all"
+            );
+
+
+        const select =
+            document.getElementById(
+                "appSelect"
+            );
+
+
+        select.innerHTML =
+            `<option value="">
+                Select App
+            </option>`;
+
+
+        if(
+            !result ||
+            !result.success ||
+            !result.data
+        ){
+
+            return;
+
+        }
+
+
+        result.data.forEach(app => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                app.id;
+
+            option.textContent =
+                app.app_name +
+                " (" +
+                app.package_name +
+                ")";
+
+            select.appendChild(
+                option
+            );
+
+        });
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        showMessage(
+            "Failed to load apps",
+            false
+        );
+
+    }
+
+}
+
+
+/*
+====================================
+GENERATE CODE
+====================================
+*/
+
+async function generateCode(){
+
+    const appId =
+        document.getElementById(
+            "appSelect"
+        ).value;
+
+
+    const hours =
+        document.getElementById(
+            "hours"
+        ).value;
+
+
+    const type =
+        document.getElementById(
+            "codeType"
+        ).value;
+
+
+    const customCode =
+        document.getElementById(
+            "customCode"
+        ).value.trim();
+
+
+    if(!appId){
+
+        showMessage(
+            "Please select an app.",
+            false
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !hours ||
+        Number(hours) <= 0
+    ){
+
+        showMessage(
+            "Enter valid expiry hours.",
+            false
+        );
+
+        return;
+
+    }
+
+
+    if(
+        type === "custom" &&
+        !customCode
+    ){
+
+        showMessage(
+            "Enter custom code.",
+            false
+        );
+
+        return;
+
+    }
+
+
+    const body = {
+
+        app_id:
+            Number(appId),
+
+        hours:
+            Number(hours),
+
+        type:
+            type
+
+    };
+
+
+    if(type === "custom"){
+
+        body.code =
+            customCode;
+
+    }
+
+
+    try{
+
+        const result =
+            await apiRequest(
+                "/verification/generate",
+                {
+                    method:"POST",
+                    body:
+                        JSON.stringify(body)
+                }
+            );
+
+
+        if(
+            !result ||
+            !result.success
+        ){
+
+            showMessage(
+                result?.message ||
+                "Code generation failed.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        const code =
+            result.data?.code ||
+            result.code;
+
+
+        document.getElementById(
+            "newCode"
+        ).textContent =
+            code || "-";
+
+
+        document.getElementById(
+            "generatedCode"
+        ).style.display =
+            "block";
+
+
+        showMessage(
+            "Verification Code Generated",
+            true
+        );
+
+
+        loadCodes();
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        showMessage(
+            "Server Error",
+            false
+        );
+
+    }
+
+}
+
+
+/*
+====================================
+LOAD CODES
+====================================
+*/
+
+async function loadCodes(){
+
+    const tbody =
+        document.getElementById(
+            "codeTable"
+        );
+
+
+    tbody.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="8"
+                class="loading">
+
+                Loading...
+
+            </td>
+
+        </tr>
+
+    `;
+
+
+    try{
+
+        const result =
+            await apiRequest(
+                "/verification/all"
+            );
+
+
+        if(
+            !result ||
+            !result.success
+        ){
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="empty">
+
+                        ${
+                            result?.message ||
+                            "Unable to load codes"
+                        }
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        if(
+            !result.data ||
+            result.data.length === 0
+        ){
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="empty">
+
+                        No verification codes found.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        tbody.innerHTML =
+            result.data
+                .map(code =>
+                    createRow(code)
+                )
+                .join("");
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="8"
+                    class="empty">
+
+                    Server Error
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+/*
+====================================
+ROW
+====================================
+*/
+
+function createRow(code){
+
+    let status =
+        code.status || "Active";
+
+
+    let statusClass =
+        "badge-active";
+
+
+    if(
+        status.toLowerCase()
+            === "used"
+    ){
+
+        statusClass =
+            "badge-used";
+
+    }
+
+
+    if(
+        status.toLowerCase()
+            === "expired"
+    ){
+
+        statusClass =
+            "badge-expired";
+
+    }
+
+
+    if(
+        status.toLowerCase()
+            === "disabled"
+    ){
+
+        statusClass =
+            "badge-disabled";
+
+    }
+
+
+    return `
+
+        <tr>
+
+            <td>
+                ${escapeHtml(code.id)}
+            </td>
+
+            <td>
+
+                <strong>
+                    ${escapeHtml(
+                        code.code || "-"
+                    )}
+                </strong>
+
+            </td>
+
+            <td>
+                ${escapeHtml(
+                    code.app_name || "-"
+                )}
+            </td>
+
+            <td>
+                ${formatDate(
+                    code.created_at
+                )}
+            </td>
+
+            <td>
+                ${formatDate(
+                    code.expires_at ||
+                    code.expiry_at
+                )}
+            </td>
+
+            <td>
+
+                <span
+                    class="badge ${statusClass}">
+
+                    ${escapeHtml(status)}
+
+                </span>
+
+            </td>
+
+            <td>
+                ${formatDate(
+                    code.used_at
+                )}
+            </td>
+
+            <td>
+
+                <button
+                    class="btn btn-red"
+                    onclick="deleteCode(${code.id})">
+
+                    🗑 Delete
+
+                </button>
+
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+/*
+====================================
+DELETE
+====================================
+*/
+
+async function deleteCode(id){
+
+    if(
+        !confirm(
+            "Delete this verification code?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    try{
+
+        const result =
+            await apiRequest(
+                "/verification/" + id,
+                {
+                    method:"DELETE"
+                }
+            );
+
+
+        if(result?.success){
+
+            showMessage(
+                "Code Deleted",
+                true
+            );
+
+            loadCodes();
+
+        }
+        else{
+
+            showMessage(
+                result?.message ||
+                "Delete failed",
+                false
+            );
+
+        }
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        showMessage(
+            "Server Error",
+            false
+        );
+
+    }
+
+}
+
+
+/*
+====================================
+COPY CODE
+====================================
+*/
+
+function copyCode(){
+
+    const code =
+        document.getElementById(
+            "newCode"
+        ).textContent;
+
+
+    if(!code || code === "-"){
+        return;
+    }
+
+
+    navigator.clipboard
+        .writeText(code)
+        .then(()=>{
+
+            showMessage(
+                "Code copied",
+                true
+            );
+
+        });
+
+}
+
+
+/*
+====================================
+DATE
+====================================
+*/
+
+function formatDate(value){
+
+    if(!value){
+
+        return "-";
+
+    }
+
+
+    try{
+
+        return new Date(value)
+            .toLocaleString();
+
+    }
+    catch{
+
+        return value;
+
+    }
+
+}
+
+
+/*
+====================================
+HTML ESCAPE
+====================================
+*/
+
+function escapeHtml(value){
+
+    if(
+        value === null ||
+        value === undefined
+    ){
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/*
+====================================
+LOGOUT
+====================================
+*/
+
+function logout(){
+
+    localStorage.removeItem(
+        "token"
+    );
+
+    localStorage.removeItem(
+        "admin"
+    );
+
+    window.location.href =
+        "/login.html";
+
+}
+
+
+/*
+====================================
+START
+====================================
+*/
+
+loadApps();
+
+loadCodes();
+
+</script>
+
+</body>
+</html>
