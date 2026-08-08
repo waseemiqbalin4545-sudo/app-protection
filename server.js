@@ -14,111 +14,62 @@ const dashboardRoutes = require("./routes/dashboard");
 const app = express();
 
 app.use(cors());
-
 app.use(express.json());
 
 /*
-=====================================
-Database Test
-=====================================
+ Database Test
 */
-
 db.query("SELECT NOW()")
 .then(() => {
-
     console.log("✅ PostgreSQL Connected");
-
 })
 .catch((err) => {
-
     console.log(err);
-
 });
 
 /*
-=====================================
-Home
-=====================================
+ Home
 */
-
-app.get("/", (req,res)=>{
-
+app.get("/", (req, res) => {
     res.json({
-
-        success:true,
-
-        project:"App Protection API",
-
-        version:"3.0",
-
-        database:"Connected"
-
+        success: true,
+        project: "App Protection API",
+        version: "3.0",
+        database: "Connected"
     });
-
 });
 
 /*
-=====================================
-Health
-=====================================
+ Health
 */
-
-app.get("/health",(req,res)=>{
-
+app.get("/health", (req, res) => {
     res.json({
-
-        success:true,
-
-        status:"online"
-
+        success: true,
+        status: "online"
     });
-
 });
 
 /*
-=====================================
-Routes
-=====================================
+ Routes
 */
-
-app.use("/api/auth",authRoutes);
-
-app.use("/api/apps",appRoutes);
-
-app.use("/api/devices",deviceRoutes);
-
-app.use("/api/verify",verifyRoutes);
-
-app.use("/api/dashboard",dashboardRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/apps", appRoutes);
+app.use("/api/devices", deviceRoutes);
+app.use("/api/verify", verifyRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 /*
-=====================================
-404
-=====================================
+ 404
 */
-
-app.use((req,res)=>{
-
+app.use((req, res) => {
     res.status(404).json({
-
-        success:false,
-
-        message:"API Not Found"
-
+        success: false,
+        message: "API Not Found"
     });
-
 });
 
-/*
-=====================================
-Server
-=====================================
-*/
+const PORT = process.env.PORT || 3000;
 
-const PORT=process.env.PORT||3000;
-
-app.listen(PORT,()=>{
-
-    console.log("Server Running On Port "+PORT);
-
+app.listen(PORT, () => {
+    console.log("Server Running On Port " + PORT);
 });
