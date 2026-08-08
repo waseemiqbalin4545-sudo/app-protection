@@ -1,96 +1,197 @@
 const db = require("../config/db");
 const { isExpired } = require("../utils/expiry");
 
-exports.verify = async (req, res) => {
+// =====================================================
+// ANDROID APP VERIFICATION
+// POST /api/verify
+// =====================================================
 
+exports.verify = async (req, res) => {
     try {
 
         const {
-
             api_key,
             package_name,
+            verification_code,
             android_id,
             device_model,
             manufacturer,
             android_version,
             app_version
-
         } = req.body;
 
-        if (!api_key || !package_name || !android_id) {
 
-            return res.json({
+        // =================================================
+        // VALIDATE PARAMETERS
+        // =================================================
+
+        if (!api_key || !package_name || !verification_code || !android_id) {
+
+            return res.status(400).json({
                 success: false,
                 message: "Missing Parameters"
             });
 
         }
 
-        /*
-        ===============================
-        Check App
-        ===============================
-        */
+
+        // =================================================
+        // CHECK APP
+        // =================================================
 
         const appResult = await db.query(
-
-            `SELECT * FROM apps
-            WHERE api_key=$1
-            AND package_name=$2
-            LIMIT 1`,
-
-            [api_key, package_name]
-
+            `
+            SELECT *
+            FROM apps
+            WHERE api_key = $1
+            AND package_name = $2
+            LIMIT 1
+            `,
+            [
+                api_key,
+                package_name
+            ]
         );
+
 
         if (appResult.rows.length === 0) {
 
-            return res.json({
+            return res.status(401).json({
                 success: false,
                 message: "Invalid App"
             });
 
         }
 
+
         const app = appResult.rows[0];
 
-        if (!app.status) {
 
-            return res.json({
+        // =================================================
+        // CHECK APP STATUS
+        // =================================================
+
+        if (
+            app.status === false ||
+            app.status === "OFF" ||
+            app.status === "Disabled" ||
+            app.status === "disabled"
+        ) {
+
+            return res.status(403).json({
                 success: false,
                 message: "App Disabled"
             });
 
         }
 
-        /*
-        ===============================
-        Check Device
-        ===============================
-        */
 
-        const deviceResult = await db.query(
+        // =================================================
+        // CHECK VERIFICATION CODE
+        // =================================================
 
-            `SELECT * FROM devices
-            WHERE app_id=$1
-            AND android_id=$2
-            LIMIT 1`,
-
-            [app.id, android_id]
-
+        const codeResult = await db.query(
+            `
+            SELECT *
+            FROM verification_codes
+            WHERE code = $1
+            AND app_id = $2
+            LIMIT 1
+            `,
+            [
+                verification_code,
+                app.id
+            ]
         );
 
-        /*
-        ===============================
-        New Device
-        ===============================
-        */
+
+        if (codeResult.rows.length === 0) {
+
+            return res.status(401).json({
+                success: false,
+                message: "Invalid Verification Code"
+            });
+
+        }
+
+
+        const code = codeResult.rows[0];
+
+
+        // =================================================
+        // CHECK CODE STATUS
+        // =================================================
+
+        if (
+            code.status === "Disabled" ||
+            code.status === "disabled" ||
+            code.status === "Expired" ||
+            code.status === "expired"
+        ) {
+
+            return res.status(403).json({
+                success: false,
+                message: "Verification Code Disabled"
+            });
+
+        }
+
+
+        // =================================================
+        // CHECK CODE EXPIRY
+        // =================================================
+
+        if (code.expires_at && isExpired(code.expires_at)) {
+
+            // Mark expired
+            await db.query(
+                `
+                UPDATE verification_codes
+                SET status = 'Expired'
+                WHERE id = $1
+                `,
+                [
+                    code.id
+                ]
+            );
+
+
+            return res.status(403).json({
+                success: false,
+                message: "Verification Code Expired"
+            });
+
+        }
+
+
+        // =================================================
+        // CHECK DEVICE
+        // =================================================
+
+        const deviceResult = await db.query(
+            `
+            SELECT *
+            FROM devices
+            WHERE app_id = $1
+            AND android_id = $2
+            LIMIT 1
+            `,
+            [
+                app.id,
+                android_id
+            ]
+        );
+
+
+        // =================================================
+        // NEW DEVICE
+        // =================================================
 
         if (deviceResult.rows.length === 0) {
 
-            await db.query(
-
-                `INSERT INTO devices
+            const newDevice = await db.query(
+                `
+                INSERT INTO devices
                 (
                     app_id,
                     android_id,
@@ -98,126 +199,192 @@ exports.verify = async (req, res) => {
                     manufacturer,
                     android_version,
                     status,
-                    created_at
+                    created_at,
+                    updated_at
                 )
                 VALUES
                 (
-                    $1,$2,$3,$4,$5,'Pending',NOW()
-                )`,
-
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    $5,
+                    'Pending',
+                    NOW(),
+                    NOW()
+                )
+                RETURNING id
+                `,
                 [
-
                     app.id,
-
                     android_id,
-
-                    device_model,
-
-                    manufacturer,
-
-                    android_version
-
+                    device_model || null,
+                    manufacturer || null,
+                    android_version || null
                 ]
-
             );
 
+
+            const newDeviceId = newDevice.rows[0].id;
+
+
+            // Bind verification code to device
+            await db.query(
+                `
+                UPDATE verification_codes
+                SET
+                    device_id = $1
+                WHERE id = $2
+                `,
+                [
+                    newDeviceId,
+                    code.id
+                ]
+            );
+
+
             return res.json({
-
                 success: false,
-
-                message: "Pending Approval"
-
+                message: "Pending Approval",
+                data: {
+                    device_id: newDeviceId,
+                    status: "Pending"
+                }
             });
 
         }
+
 
         const device = deviceResult.rows[0];
 
-        /*
-        ===============================
-        Blocked
-        ===============================
-        */
 
-        if (device.status === "Blocked") {
+        // =================================================
+        // BLOCKED DEVICE
+        // =================================================
 
-            return res.json({
+        if (
+            device.status === "Blocked" ||
+            device.status === "blocked"
+        ) {
 
+            return res.status(403).json({
                 success: false,
-
                 message: "Device Blocked"
-
             });
 
         }
 
-        /*
-        ===============================
-        Pending
-        ===============================
-        */
 
-        if (device.status === "Pending") {
+        // =================================================
+        // PENDING DEVICE
+        // =================================================
+
+        if (
+            device.status === "Pending" ||
+            device.status === "pending"
+        ) {
 
             return res.json({
-
                 success: false,
-
-                message: "Pending Approval"
-
+                message: "Pending Approval",
+                data: {
+                    device_id: device.id,
+                    status: device.status
+                }
             });
 
         }
 
-        /*
-        ===============================
-        Expired
-        ===============================
-        */
+
+        // =================================================
+        // ACTIVE DEVICE EXPIRY
+        // =================================================
 
         if (device.active_until) {
 
             if (isExpired(device.active_until)) {
 
-                return res.json({
+                await db.query(
+                    `
+                    UPDATE devices
+                    SET
+                        status = 'Pending',
+                        updated_at = NOW()
+                    WHERE id = $1
+                    `,
+                    [
+                        device.id
+                    ]
+                );
 
+
+                return res.status(403).json({
                     success: false,
-
                     message: "Activation Expired"
-
                 });
 
             }
 
         }
 
-        /*
-        ===============================
-        Heartbeat
-        ===============================
-        */
+
+        // =================================================
+        // VERIFY CODE DEVICE BINDING
+        // =================================================
+
+        if (
+            code.device_id &&
+            Number(code.device_id) !== Number(device.id)
+        ) {
+
+            return res.status(403).json({
+                success: false,
+                message: "Verification Code Already Used"
+            });
+
+        }
+
+
+        // =================================================
+        // UPDATE DEVICE HEARTBEAT
+        // =================================================
 
         await db.query(
-
-            `UPDATE devices
+            `
+            UPDATE devices
             SET
-            last_seen=NOW(),
-            updated_at=NOW()
-            WHERE id=$1`,
-
+                last_seen = NOW(),
+                updated_at = NOW()
+            WHERE id = $1
+            `,
             [
-
                 device.id
-
             ]
-
         );
 
-        /*
-        ===============================
-        Success
-        ===============================
-        */
+
+        // =================================================
+        // UPDATE CODE
+        // =================================================
+
+        await db.query(
+            `
+            UPDATE verification_codes
+            SET
+                device_id = $1,
+                used_at = COALESCE(used_at, NOW())
+            WHERE id = $2
+            `,
+            [
+                device.id,
+                code.id
+            ]
+        );
+
+
+        // =================================================
+        // SUCCESS
+        // =================================================
 
         return res.json({
 
@@ -233,19 +400,25 @@ exports.verify = async (req, res) => {
 
                 android_id: device.android_id,
 
+                device_id: device.id,
+
                 status: device.status,
 
                 active_until: device.active_until,
 
-                app_version: app_version
+                verification_code: code.code,
+
+                app_version: app_version || null
 
             }
 
         });
 
+
     } catch (err) {
 
-        console.log(err);
+        console.error("VERIFY ERROR:", err);
+
 
         return res.status(500).json({
 
@@ -256,5 +429,4 @@ exports.verify = async (req, res) => {
         });
 
     }
-
 };
