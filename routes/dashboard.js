@@ -2,17 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const auth = require("../middleware/auth");
+const dashboardController = require("../controllers/dashboardController");
 
-router.get("/", auth, (req, res) => {
-
-    res.json({
-
-        success: true,
-
-        message: "Dashboard API Working"
-
-    });
-
-});
+router.get("/", auth, dashboardController.dashboard);
 
 module.exports = router;
