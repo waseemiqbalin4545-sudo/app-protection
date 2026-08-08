@@ -2,81 +2,119 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Apps - App Protection</title>
 
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
         }
 
         body {
-            background: #f4f6f9;
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f3f4f6;
             color: #111827;
         }
 
-        /* SIDEBAR */
+        /* =========================
+           LAYOUT
+        ========================= */
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+
+        /* =========================
+           SIDEBAR
+        ========================= */
 
         .sidebar {
+            width: 205px;
+            background: #111827;
+            color: white;
             position: fixed;
             left: 0;
             top: 0;
-            width: 210px;
-            height: 100vh;
-            background: #111827;
-            color: white;
-            padding: 20px 13px;
+            bottom: 0;
+            padding: 20px 12px;
             z-index: 1000;
         }
 
-        .brand {
+
+        .logo {
             font-size: 20px;
             font-weight: bold;
-            padding: 10px;
-            margin-bottom: 25px;
+            padding: 8px 10px 28px;
+            line-height: 1.1;
         }
 
-        .brand span {
-            color: #60a5fa;
+
+        .logo span {
+            color: #3b82f6;
         }
 
-        .menu {
-            list-style: none;
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
         }
 
-        .menu li {
-            margin-bottom: 6px;
-        }
 
-        .menu a {
-            display: block;
-            text-decoration: none;
+        .nav a {
             color: #d1d5db;
-            padding: 12px 14px;
-            border-radius: 8px;
+            text-decoration: none;
+            padding: 11px 13px;
+            border-radius: 7px;
+            font-size: 14px;
+            display: block;
+            transition: 0.2s;
         }
 
-        .menu a:hover,
-        .menu a.active {
+
+        .nav a:hover {
+            background: #1f2937;
+            color: white;
+        }
+
+
+        .nav a.active {
             background: #2563eb;
             color: white;
         }
 
-        /* MAIN */
+
+        /* =========================
+           MAIN
+        ========================= */
 
         .main {
-            margin-left: 210px;
+            margin-left: 205px;
+            width: calc(100% - 205px);
             min-height: 100vh;
         }
 
-        /* TOPBAR */
+
+        /* =========================
+           TOPBAR
+        ========================= */
 
         .topbar {
-            height: 65px;
+            height: 57px;
             background: white;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
@@ -85,20 +123,29 @@
             padding: 0 25px;
         }
 
-        .page-title {
-            font-size: 20px;
+
+        .topbar-title {
+            font-size: 18px;
             font-weight: bold;
         }
 
-        .admin-info {
+
+        .topbar-right {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .admin-avatar {
-            width: 38px;
-            height: 38px;
+
+        .username {
+            font-size: 14px;
+            color: #111827;
+        }
+
+
+        .avatar {
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: #2563eb;
             color: white;
@@ -108,588 +155,1063 @@
             font-weight: bold;
         }
 
-        .logout {
-            border: none;
+
+        .logout-btn {
             background: #ef4444;
             color: white;
-            padding: 9px 15px;
-            border-radius: 7px;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 6px;
             cursor: pointer;
+            font-weight: bold;
         }
 
-        /* CONTENT */
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+
+        /* =========================
+           CONTENT
+        ========================= */
 
         .content {
-            padding: 30px;
+            padding: 28px;
         }
 
-        .welcome {
+
+        .page-title {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+
+        .page-subtitle {
+            color: #64748b;
             margin-bottom: 25px;
         }
 
-        .welcome h1 {
-            font-size: 27px;
-            margin-bottom: 6px;
-        }
 
-        .welcome p {
-            color: #6b7280;
-        }
+        /* =========================
+           CARD
+        ========================= */
 
-        /* PANEL */
-
-        .panel {
+        .card {
             background: white;
-            border-radius: 12px;
-            margin-top: 22px;
-            padding: 25px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow:
+                0 2px 10px rgba(0,0,0,0.04);
         }
 
-        .panel h2 {
+
+        .card-title {
+            font-size: 21px;
+            font-weight: bold;
             margin-bottom: 20px;
         }
 
-        /* FORM */
+
+        /* =========================
+           FORM
+        ========================= */
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns:
+                repeat(3, 1fr);
             gap: 15px;
         }
 
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+
         .form-group label {
-            display: block;
             font-size: 13px;
             font-weight: bold;
             margin-bottom: 7px;
         }
 
+
         .form-group input {
-            width: 100%;
-            padding: 11px;
+            height: 42px;
             border: 1px solid #d1d5db;
-            border-radius: 7px;
+            border-radius: 6px;
+            padding: 0 12px;
+            font-size: 14px;
             outline: none;
         }
 
+
         .form-group input:focus {
             border-color: #2563eb;
+            box-shadow:
+                0 0 0 2px rgba(37,99,235,0.1);
         }
 
+
         .add-btn {
-            margin-top: 18px;
-            border: none;
+            margin-top: 17px;
             background: #2563eb;
             color: white;
-            padding: 11px 18px;
-            border-radius: 7px;
+            border: none;
+            padding: 11px 17px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
         }
+
 
         .add-btn:hover {
             background: #1d4ed8;
         }
 
+
         .add-btn:disabled {
-            background: #93c5fd;
+            opacity: 0.6;
             cursor: not-allowed;
         }
 
-        /* MESSAGE */
+
+        /* =========================
+           MESSAGE
+        ========================= */
 
         .message {
-            margin-top: 15px;
-            padding: 11px;
-            border-radius: 7px;
             display: none;
+            margin-top: 15px;
+            padding: 11px 13px;
+            border-radius: 6px;
+            font-size: 14px;
         }
 
-        .success {
+
+        .message.success {
+            display: block;
             background: #dcfce7;
             color: #166534;
         }
 
-        .error {
+
+        .message.error {
+            display: block;
             background: #fee2e2;
             color: #991b1b;
         }
 
-        /* TABLE */
 
-        .table-container {
+        /* =========================
+           TABLE HEADER
+        ========================= */
+
+        .management-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+
+        .refresh-btn {
+            background: #374151;
+            color: white;
+            border: none;
+            padding: 9px 13px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+
+        .refresh-btn:hover {
+            background: #1f2937;
+        }
+
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-wrapper {
+            width: 100%;
             overflow-x: auto;
         }
+
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 900px;
+            min-width: 950px;
         }
+
+
+        thead {
+            background: #f8fafc;
+        }
+
 
         th {
-            background: #f8fafc;
             text-align: left;
-            padding: 12px;
-            font-size: 13px;
+            padding: 13px 10px;
+            font-size: 12px;
+            color: #334155;
             border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
         }
+
 
         td {
-            padding: 12px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 13px 10px;
             font-size: 13px;
+            border-bottom: 1px solid #eef0f3;
+            vertical-align: middle;
         }
 
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+
+        /* =========================
+           API KEY
+        ========================= */
+
+        .api-key-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            max-width: 330px;
+        }
+
+
         .api-key {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 6px 8px;
+            border-radius: 5px;
             font-family: monospace;
-            background: #f3f4f6;
+            font-size: 11px;
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+
+        .copy-btn {
+            border: none;
+            background: #e2e8f0;
+            color: #334155;
             padding: 5px 7px;
             border-radius: 5px;
-            word-break: break-all;
+            cursor: pointer;
+            font-size: 11px;
         }
+
+
+        .copy-btn:hover {
+            background: #cbd5e1;
+        }
+
+
+        /* =========================
+           STATUS
+        ========================= */
 
         .status {
             display: inline-block;
             padding: 5px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
 
-        .status-on {
+
+        .status.on {
             background: #dcfce7;
-            color: #166534;
+            color: #15803d;
         }
 
-        .status-off {
+
+        .status.off {
             background: #fee2e2;
-            color: #991b1b;
+            color: #b91c1c;
         }
+
+
+        /* =========================
+           ACTION BUTTONS
+        ========================= */
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+
+        .action-btn {
+            border: none;
+            padding: 7px 9px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+
+        .edit-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+
+        .edit-btn:hover {
+            background: #1d4ed8;
+        }
+
+
+        .on-btn {
+            background: #16a34a;
+            color: white;
+        }
+
+
+        .on-btn:hover {
+            background: #15803d;
+        }
+
+
+        .off-btn {
+            background: #f59e0b;
+            color: white;
+        }
+
+
+        .off-btn:hover {
+            background: #d97706;
+        }
+
 
         .delete-btn {
-            border: none;
             background: #ef4444;
             color: white;
-            padding: 7px 11px;
-            border-radius: 6px;
-            cursor: pointer;
         }
+
 
         .delete-btn:hover {
             background: #dc2626;
         }
 
+
+        /* =========================
+           EMPTY
+        ========================= */
+
         .empty {
             text-align: center;
-            color: #6b7280;
-            padding: 25px;
+            color: #64748b;
+            padding: 35px;
         }
+
 
         .loading {
             text-align: center;
-            padding: 20px;
-            color: #6b7280;
+            padding: 30px;
+            color: #64748b;
         }
 
-        /* MOBILE */
 
-        @media (max-width: 900px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        /* =========================
+           MOBILE
+        ========================= */
 
-        @media (max-width: 700px) {
+        @media (max-width: 850px) {
 
             .sidebar {
-                position: fixed;
-                transform: translateX(-100%);
-                transition: 0.25s;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
+                width: 170px;
             }
 
             .main {
-                margin-left: 0;
+                margin-left: 170px;
+                width: calc(100% - 170px);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
             }
 
             .content {
                 padding: 18px;
             }
 
-            .topbar {
-                padding: 0 15px;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 10px;
             }
 
-            .admin-name {
+
+            .layout {
+                display: block;
+            }
+
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+
+            .logo {
+                padding: 5px 8px 12px;
+            }
+
+
+            .nav {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+
+            .nav a {
+                white-space: nowrap;
+            }
+
+
+            .topbar {
+                padding: 0 12px;
+            }
+
+
+            .username {
                 display: none;
             }
+
+
+            .content {
+                padding: 14px;
+            }
+
+
+            .card {
+                padding: 15px;
+            }
+
+
+            .page-title {
+                font-size: 22px;
+            }
+
         }
+
     </style>
 </head>
 
+
 <body>
 
-<!-- SIDEBAR -->
+<div class="layout">
 
-<aside class="sidebar" id="sidebar">
 
-    <div class="brand">
-        🛡 App <span>Protection</span>
-    </div>
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
 
-    <ul class="menu">
+    <aside class="sidebar">
 
-        <li>
+        <div class="logo">
+            🛡️ App <span>Protection</span>
+        </div>
+
+
+        <nav class="nav">
+
             <a href="/dashboard.html">
                 🏠 Dashboard
             </a>
-        </li>
 
-        <li>
-            <a href="/apps.html" class="active">
+
+            <a
+                href="/apps.html"
+                class="active"
+            >
                 📱 Apps
             </a>
-        </li>
 
-        <li>
+
             <a href="/devices.html">
-                📲 Devices
+                📟 Devices
             </a>
-        </li>
 
-        <li>
+
             <a href="/verification.html">
                 🔐 Verification
             </a>
-        </li>
 
-        <li>
+
             <a href="/settings.html">
-                ⚙ Settings
+                ⚙️ Settings
             </a>
-        </li>
 
-    </ul>
+        </nav>
 
-</aside>
+    </aside>
 
 
-<!-- MAIN -->
 
-<div class="main">
+    <!-- =========================
+         MAIN
+    ========================== -->
 
-    <!-- TOPBAR -->
+    <main class="main">
 
-    <header class="topbar">
 
-        <div class="page-title">
-            Apps
-        </div>
+        <!-- TOPBAR -->
 
-        <div class="admin-info">
+        <header class="topbar">
 
-            <div class="admin-name" id="adminName">
-                admin
+            <div class="topbar-title">
+                Apps
             </div>
 
-            <div class="admin-avatar" id="avatar">
-                A
+
+            <div class="topbar-right">
+
+                <span
+                    class="username"
+                    id="username"
+                >
+                    admin
+                </span>
+
+
+                <div
+                    class="avatar"
+                    id="avatar"
+                >
+                    A
+                </div>
+
+
+                <button
+                    class="logout-btn"
+                    onclick="logout()"
+                >
+                    Logout
+                </button>
+
             </div>
 
-            <button class="logout" onclick="logout()">
-                Logout
-            </button>
-
-        </div>
-
-    </header>
+        </header>
 
 
-    <!-- CONTENT -->
 
-    <main class="content">
+        <!-- CONTENT -->
 
-        <div class="welcome">
+        <section class="content">
 
-            <h1>
+
+            <h1 class="page-title">
                 Apps
             </h1>
 
-            <p>
+
+            <p class="page-subtitle">
                 Manage protected applications.
             </p>
 
-        </div>
 
 
-        <!-- ADD APP -->
+            <!-- =========================
+                 ADD APP
+            ========================== -->
 
-        <div class="panel">
+            <div class="card">
 
-            <h2>
-                Add New App
-            </h2>
+                <div class="card-title">
+                    Add New App
+                </div>
 
-            <form id="addAppForm">
 
-                <div class="form-grid">
+                <form
+                    id="addAppForm"
+                    onsubmit="addApp(event)"
+                >
 
-                    <div class="form-group">
+                    <div class="form-grid">
 
-                        <label>
-                            App Name
-                        </label>
 
-                        <input
-                            type="text"
-                            id="app_name"
-                            placeholder="Example App"
-                            required
-                        >
+                        <div class="form-group">
+
+                            <label>
+                                App Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="appName"
+                                placeholder="Example App"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Package Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="packageName"
+                                placeholder="com.example.app"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Version
+                            </label>
+
+                            <input
+                                type="text"
+                                id="version"
+                                value="1.0"
+                                placeholder="1.0"
+                            >
+
+                        </div>
+
 
                     </div>
 
 
-                    <div class="form-group">
+                    <button
+                        type="submit"
+                        class="add-btn"
+                        id="addButton"
+                    >
+                        + Add App
+                    </button>
 
-                        <label>
-                            Package Name
-                        </label>
 
-                        <input
-                            type="text"
-                            id="package_name"
-                            placeholder="com.example.app"
-                            required
-                        >
+                    <div
+                        id="message"
+                        class="message"
+                    ></div>
+
+                </form>
+
+            </div>
+
+
+
+            <!-- =========================
+                 APP MANAGEMENT
+            ========================== -->
+
+            <div class="card">
+
+
+                <div class="management-header">
+
+                    <div class="card-title"
+                         style="margin-bottom:0">
+
+                        App Management
 
                     </div>
 
 
-                    <div class="form-group">
+                    <button
+                        class="refresh-btn"
+                        onclick="loadApps()"
+                    >
+                        🔄 Refresh
+                    </button>
 
-                        <label>
-                            Version
-                        </label>
+                </div>
 
-                        <input
-                            type="text"
-                            id="version"
-                            placeholder="1.0"
-                            value="1.0"
-                        >
 
+
+                <div
+                    id="tableArea"
+                    class="table-wrapper"
+                >
+
+                    <div class="loading">
+                        Loading apps...
                     </div>
 
                 </div>
 
 
-                <button
-                    type="submit"
-                    class="add-btn"
-                    id="addBtn"
-                >
-                    + Add App
-                </button>
-
-            </form>
-
-
-            <div
-                id="message"
-                class="message"
-            ></div>
-
-        </div>
-
-
-        <!-- APP MANAGEMENT -->
-
-        <div class="panel">
-
-            <h2>
-                App Management
-            </h2>
-
-            <div class="table-container">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>ID</th>
-
-                            <th>App Name</th>
-
-                            <th>Package Name</th>
-
-                            <th>Version</th>
-
-                            <th>API Key</th>
-
-                            <th>Status</th>
-
-                            <th>Action</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="appsTable">
-
-                        <tr>
-
-                            <td
-                                colspan="7"
-                                class="loading"
-                            >
-                                Loading apps...
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
             </div>
 
-        </div>
+
+        </section>
 
     </main>
 
 </div>
 
 
+
 <script>
 
-/* ==========================================
-   API URL
-========================================== */
 
-const API_URL = "";
+/* =====================================================
+   CONFIG
+===================================================== */
 
 
-/* ==========================================
-   AUTH CHECK
-========================================== */
+const API_URL =
+    window.location.origin;
 
-const token = localStorage.getItem("token");
 
-if (!token) {
+/* =====================================================
+   TOKEN
+===================================================== */
 
-    window.location.href = "/login.html";
+function getToken() {
+
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("accessToken") ||
+        localStorage.getItem("authToken") ||
+        localStorage.getItem("jwt") ||
+        ""
+    );
 
 }
 
 
-/* ==========================================
-   ADMIN DATA
-========================================== */
+const token = getToken();
 
-const adminData = localStorage.getItem("admin");
 
-if (adminData) {
+
+/* =====================================================
+   USERNAME
+===================================================== */
+
+function loadUser() {
+
+    const username =
+        localStorage.getItem("username") ||
+        localStorage.getItem("admin_username") ||
+        "admin";
+
+
+    document.getElementById("username")
+        .textContent = username;
+
+
+    document.getElementById("avatar")
+        .textContent =
+        username.charAt(0).toUpperCase();
+
+}
+
+
+loadUser();
+
+
+
+/* =====================================================
+   AUTH HEADERS
+===================================================== */
+
+function authHeaders() {
+
+    const headers = {
+        "Content-Type":
+            "application/json"
+    };
+
+
+    if (token) {
+
+        headers["Authorization"] =
+            "Bearer " + token;
+
+    }
+
+
+    return headers;
+
+}
+
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+function showMessage(text, type) {
+
+    const box =
+        document.getElementById("message");
+
+
+    box.textContent = text;
+
+    box.className =
+        "message " + type;
+
+
+    setTimeout(() => {
+
+        box.className = "message";
+
+    }, 4000);
+
+}
+
+
+
+/* =====================================================
+   ADD APP
+===================================================== */
+
+async function addApp(event) {
+
+    event.preventDefault();
+
+
+    const appName =
+        document.getElementById("appName")
+            .value
+            .trim();
+
+
+    const packageName =
+        document.getElementById("packageName")
+            .value
+            .trim();
+
+
+    const version =
+        document.getElementById("version")
+            .value
+            .trim() || "1.0";
+
+
+    if (!appName || !packageName) {
+
+        showMessage(
+            "App Name & Package Name Required",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById("addButton");
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Adding...";
+
 
     try {
 
-        const admin = JSON.parse(adminData);
+        const response =
+            await fetch(
 
-        const username = admin.username || "Admin";
+                API_URL +
+                "/api/apps/add",
 
-        document.getElementById("adminName").textContent =
-            username;
+                {
 
-        document.getElementById("avatar").textContent =
-            username.charAt(0).toUpperCase();
+                    method: "POST",
 
-    } catch (e) {
+                    headers:
+                        authHeaders(),
 
-        console.log(e);
+                    body:
+                        JSON.stringify({
+
+                            app_name:
+                                appName,
+
+                            package_name:
+                                packageName,
+
+                            version:
+                                version
+
+                        })
+
+                }
+
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok ||
+            !result.success) {
+
+            throw new Error(
+
+                result.message ||
+                "Unable to add app"
+
+            );
+
+        }
+
+
+        showMessage(
+            "App Added Successfully",
+            "success"
+        );
+
+
+        document.getElementById(
+            "addAppForm"
+        ).reset();
+
+
+        document.getElementById(
+            "version"
+        ).value = "1.0";
+
+
+        loadApps();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "ADD APP:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Server Error",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        button.disabled = false;
+
+        button.textContent =
+            "+ Add App";
 
     }
 
 }
 
 
-/* ==========================================
-   SHOW MESSAGE
-========================================== */
 
-function showMessage(text, type) {
-
-    const message = document.getElementById("message");
-
-    message.textContent = text;
-
-    message.className =
-        "message " + type;
-
-    message.style.display = "block";
-
-}
-
-
-/* ==========================================
+/* =====================================================
    LOAD APPS
-========================================== */
+===================================================== */
 
 async function loadApps() {
 
-    const table =
-        document.getElementById("appsTable");
+    const area =
+        document.getElementById(
+            "tableArea"
+        );
 
-    table.innerHTML = `
-        <tr>
-            <td colspan="7" class="loading">
-                Loading apps...
-            </td>
-        </tr>
+
+    area.innerHTML = `
+        <div class="loading">
+            Loading apps...
+        </div>
     `;
+
 
     try {
 
-        const response = await fetch(
-            API_URL + "/api/apps/all",
-            {
-                method: "GET",
+        const response =
+            await fetch(
 
-                headers: {
-                    "Authorization": "Bearer " + token,
-                    "Content-Type": "application/json"
+                API_URL +
+                "/api/apps/all",
+
+                {
+
+                    method: "GET",
+
+                    headers:
+                        authHeaders()
+
                 }
-            }
-        );
 
-        const result = await response.json();
-
-        console.log("Apps API:", result);
+            );
 
 
-        if (!response.ok || !result.success) {
+        const result =
+            await response.json();
+
+
+        if (!response.ok ||
+            !result.success) {
 
             throw new Error(
-                result.message || "Unable to load apps"
+
+                result.message ||
+                "Unable to load apps"
+
             );
 
         }
 
 
-        if (!result.data || result.data.length === 0) {
+        const apps =
+            result.data || [];
 
-            table.innerHTML = `
-                <tr>
-                    <td colspan="7" class="empty">
-                        No apps found.
-                    </td>
-                </tr>
+
+        if (apps.length === 0) {
+
+            area.innerHTML = `
+
+                <div class="empty">
+
+                    No apps found.
+
+                </div>
+
             `;
 
             return;
@@ -697,69 +1219,269 @@ async function loadApps() {
         }
 
 
-        table.innerHTML = "";
+        let html = `
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            App Name
+                        </th>
+
+                        <th>
+                            Package Name
+                        </th>
+
+                        <th>
+                            Version
+                        </th>
+
+                        <th>
+                            API Key
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+        `;
 
 
-        result.data.forEach(app => {
+        apps.forEach(app => {
 
-            const status =
+
+            const isOn =
                 app.status === true ||
-                app.status === "true"
-                    ? `<span class="status status-on">ON</span>`
-                    : `<span class="status status-off">OFF</span>`;
+                app.status === "true" ||
+                app.status === 1 ||
+                app.status === "1";
 
 
-            const row = document.createElement("tr");
+            const statusHTML =
+                isOn
 
-            row.innerHTML = `
+                ?
 
-                <td>${app.id ?? ""}</td>
+                `
+                <span class="status on">
+                    🟢 ON
+                </span>
+                `
 
-                <td>${escapeHtml(app.app_name ?? "")}</td>
+                :
 
-                <td>${escapeHtml(app.package_name ?? "")}</td>
+                `
+                <span class="status off">
+                    🔴 OFF
+                </span>
+                `;
 
-                <td>${escapeHtml(app.version ?? "")}</td>
 
-                <td>
-                    <span class="api-key">
-                        ${escapeHtml(app.api_key ?? "")}
-                    </span>
-                </td>
+            const actionHTML =
+                isOn
 
-                <td>
-                    ${status}
-                </td>
+                ?
 
-                <td>
+                `
+                <button
+                    class="action-btn edit-btn"
+                    onclick="editApp(${app.id})"
+                >
+                    ✏️ Edit
+                </button>
 
-                    <button
-                        class="delete-btn"
-                        onclick="deleteApp(${app.id})"
-                    >
-                        Delete
-                    </button>
+                <button
+                    class="action-btn off-btn"
+                    onclick="toggleStatus(
+                        ${app.id},
+                        true
+                    )"
+                >
+                    🔴 OFF
+                </button>
+                `
 
-                </td>
+                :
+
+                `
+                <button
+                    class="action-btn edit-btn"
+                    onclick="editApp(${app.id})"
+                >
+                    ✏️ Edit
+                </button>
+
+                <button
+                    class="action-btn on-btn"
+                    onclick="toggleStatus(
+                        ${app.id},
+                        false
+                    )"
+                >
+                    🟢 ON
+                </button>
+                `;
+
+
+            const apiKey =
+                app.api_key || "";
+
+
+            html += `
+
+                <tr>
+
+                    <td>
+                        ${escapeHTML(app.id)}
+                    </td>
+
+
+                    <td>
+                        <strong>
+                            ${escapeHTML(
+                                app.app_name
+                            )}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        ${escapeHTML(
+                            app.package_name
+                        )}
+                    </td>
+
+
+                    <td>
+                        ${escapeHTML(
+                            app.version || "1.0"
+                        )}
+                    </td>
+
+
+                    <td>
+
+                        <div class="api-key-box">
+
+                            <span
+                                class="api-key"
+                                title="${escapeHTML(
+                                    apiKey
+                                )}"
+                            >
+                                ${escapeHTML(
+                                    apiKey
+                                )}
+                            </span>
+
+
+                            <button
+                                class="copy-btn"
+                                onclick="copyApiKey(
+                                    '${escapeAttribute(
+                                        apiKey
+                                    )}'
+                                )"
+                            >
+                                📋
+                            </button>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        ${statusHTML}
+                    </td>
+
+
+                    <td>
+
+                        <div class="action-buttons">
+
+                            ${actionHTML}
+
+
+                            <button
+                                class="action-btn delete-btn"
+                                onclick="deleteApp(
+                                    ${app.id}
+                                )"
+                            >
+                                🗑 Delete
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
 
             `;
 
-            table.appendChild(row);
-
         });
+
+
+        html += `
+
+                </tbody>
+
+            </table>
+
+        `;
+
+
+        area.innerHTML =
+            html;
 
     }
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "LOAD APPS:",
+            error
+        );
 
-        table.innerHTML = `
-            <tr>
-                <td colspan="7" class="empty">
-                    ${escapeHtml(error.message)}
-                </td>
-            </tr>
+
+        area.innerHTML = `
+
+            <div class="empty">
+
+                ❌ ${escapeHTML(
+                    error.message ||
+                    "Unable to load apps"
+                )}
+
+                <br><br>
+
+                <button
+                    class="refresh-btn"
+                    onclick="loadApps()"
+                >
+                    Try Again
+                </button>
+
+            </div>
+
         `;
 
     }
@@ -767,144 +1489,220 @@ async function loadApps() {
 }
 
 
-/* ==========================================
-   ADD APP
-========================================== */
 
-document
-    .getElementById("addAppForm")
-    .addEventListener("submit", async function(e) {
+/* =====================================================
+   EDIT APP
+===================================================== */
 
-        e.preventDefault();
+async function editApp(id) {
+
+    try {
+
+        const response =
+            await fetch(
+
+                API_URL +
+                "/api/apps/" +
+                id,
+
+                {
+
+                    method: "GET",
+
+                    headers:
+                        authHeaders()
+
+                }
+
+            );
 
 
-        const app_name =
-            document
-                .getElementById("app_name")
-                .value
-                .trim();
+        const result =
+            await response.json();
 
 
-        const package_name =
-            document
-                .getElementById("package_name")
-                .value
-                .trim();
+        if (!response.ok ||
+            !result.success) {
+
+            throw new Error(
+
+                result.message ||
+                "Unable to load app"
+
+            );
+
+        }
+
+
+        const app =
+            result.data;
+
+
+        const appName =
+            prompt(
+                "App Name:",
+                app.app_name
+            );
+
+
+        if (appName === null) {
+
+            return;
+
+        }
+
+
+        const packageName =
+            prompt(
+                "Package Name:",
+                app.package_name
+            );
+
+
+        if (packageName === null) {
+
+            return;
+
+        }
 
 
         const version =
-            document
-                .getElementById("version")
-                .value
-                .trim() || "1.0";
+            prompt(
+                "Version:",
+                app.version || "1.0"
+            );
 
 
-        const button =
-            document.getElementById("addBtn");
+        if (version === null) {
+
+            return;
+
+        }
 
 
-        button.disabled = true;
+        if (
+            !appName.trim() ||
+            !packageName.trim()
+        ) {
 
-        button.textContent = "Adding...";
+            alert(
+                "App Name & Package Name Required"
+            );
+
+            return;
+
+        }
 
 
-        try {
+        const updateResponse =
+            await fetch(
 
-            const response = await fetch(
-                API_URL + "/api/apps/add",
+                API_URL +
+                "/api/apps/" +
+                id,
+
                 {
 
-                    method: "POST",
+                    method: "PUT",
 
-                    headers: {
+                    headers:
+                        authHeaders(),
 
-                        "Authorization":
-                            "Bearer " + token,
+                    body:
+                        JSON.stringify({
 
-                        "Content-Type":
-                            "application/json"
+                            app_name:
+                                appName.trim(),
 
-                    },
+                            package_name:
+                                packageName.trim(),
 
-                    body: JSON.stringify({
+                            version:
+                                version.trim() ||
+                                "1.0"
 
-                        app_name,
-                        package_name,
-                        version
-
-                    })
+                        })
 
                 }
+
             );
 
 
-            const result =
-                await response.json();
+        const updateResult =
+            await updateResponse.json();
 
 
-            console.log("Add App API:", result);
+        if (
+            !updateResponse.ok ||
+            !updateResult.success
+        ) {
 
+            throw new Error(
 
-            if (!response.ok || !result.success) {
+                updateResult.message ||
+                "Update failed"
 
-                throw new Error(
-                    result.message || "App could not be added"
-                );
-
-            }
-
-
-            showMessage(
-                "App Added Successfully",
-                "success"
-            );
-
-
-            document
-                .getElementById("addAppForm")
-                .reset();
-
-
-            document
-                .getElementById("version")
-                .value = "1.0";
-
-
-            await loadApps();
-
-        }
-
-        catch (error) {
-
-            console.error(error);
-
-            showMessage(
-                error.message,
-                "error"
             );
 
         }
 
-        finally {
 
-            button.disabled = false;
-
-            button.textContent = "+ Add App";
-
-        }
-
-    });
+        showMessage(
+            "App Updated Successfully",
+            "success"
+        );
 
 
-/* ==========================================
-   DELETE APP
-========================================== */
+        loadApps();
 
-async function deleteApp(id) {
+    }
 
-    if (!confirm(
-        "Are you sure you want to delete this app?"
-    )) {
+    catch (error) {
+
+        console.error(
+            "EDIT APP:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Update failed",
+            "error"
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   ON / OFF
+===================================================== */
+
+async function toggleStatus(
+    id,
+    currentStatus
+) {
+
+    const newStatus =
+        !currentStatus;
+
+
+    const action =
+        newStatus
+            ? "enable"
+            : "disable";
+
+
+    if (
+        !confirm(
+            "Are you sure you want to " +
+            action +
+            " this app?"
+        )
+    ) {
 
         return;
 
@@ -913,37 +1711,140 @@ async function deleteApp(id) {
 
     try {
 
-        const response = await fetch(
+        const response =
+            await fetch(
 
-            API_URL + "/api/apps/" + id,
+                API_URL +
+                "/api/apps/" +
+                id +
+                "/status",
 
-            {
+                {
 
-                method: "DELETE",
+                    method: "PATCH",
 
-                headers: {
+                    headers:
+                        authHeaders(),
 
-                    "Authorization":
-                        "Bearer " + token,
+                    body:
+                        JSON.stringify({
 
-                    "Content-Type":
-                        "application/json"
+                            status:
+                                newStatus
+
+                        })
 
                 }
 
-            }
-
-        );
+            );
 
 
         const result =
             await response.json();
 
 
-        if (!response.ok || !result.success) {
+        if (
+            !response.ok ||
+            !result.success
+        ) {
 
             throw new Error(
-                result.message || "Delete failed"
+
+                result.message ||
+                "Status update failed"
+
+            );
+
+        }
+
+
+        showMessage(
+
+            newStatus
+                ? "App Enabled Successfully"
+                : "App Disabled Successfully",
+
+            "success"
+
+        );
+
+
+        loadApps();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "STATUS:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Status update failed",
+            "error"
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   DELETE APP
+===================================================== */
+
+async function deleteApp(id) {
+
+    if (
+        !confirm(
+            "Are you sure you want to delete this app?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+
+                API_URL +
+                "/api/apps/" +
+                id,
+
+                {
+
+                    method: "DELETE",
+
+                    headers:
+                        authHeaders()
+
+                }
+
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+
+                result.message ||
+                "Delete failed"
+
             );
 
         }
@@ -961,10 +1862,15 @@ async function deleteApp(id) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "DELETE:",
+            error
+        );
+
 
         showMessage(
-            error.message,
+            error.message ||
+            "Delete failed",
             "error"
         );
 
@@ -973,36 +1879,70 @@ async function deleteApp(id) {
 }
 
 
-/* ==========================================
-   HTML ESCAPE
-========================================== */
 
-function escapeHtml(value) {
+/* =====================================================
+   COPY API KEY
+===================================================== */
 
-    return String(value)
+async function copyApiKey(apiKey) {
 
-        .replace(/&/g, "&amp;")
+    try {
 
-        .replace(/</g, "&lt;")
+        await navigator.clipboard.writeText(
+            apiKey
+        );
 
-        .replace(/>/g, "&gt;")
 
-        .replace(/"/g, "&quot;")
+        showMessage(
+            "API Key Copied",
+            "success"
+        );
 
-        .replace(/'/g, "&#039;");
+    }
+
+    catch (error) {
+
+        prompt(
+            "Copy API Key:",
+            apiKey
+        );
+
+    }
 
 }
 
 
-/* ==========================================
+
+/* =====================================================
    LOGOUT
-========================================== */
+===================================================== */
 
 function logout() {
 
-    localStorage.removeItem("token");
+    localStorage.removeItem(
+        "token"
+    );
 
-    localStorage.removeItem("admin");
+    localStorage.removeItem(
+        "accessToken"
+    );
+
+    localStorage.removeItem(
+        "authToken"
+    );
+
+    localStorage.removeItem(
+        "jwt"
+    );
+
+    localStorage.removeItem(
+        "username"
+    );
+
+    localStorage.removeItem(
+        "admin_username"
+    );
+
 
     window.location.href =
         "/login.html";
@@ -1010,9 +1950,71 @@ function logout() {
 }
 
 
-/* ==========================================
-   LOAD
-========================================== */
+
+/* =====================================================
+   HTML SECURITY
+===================================================== */
+
+function escapeHTML(value) {
+
+    if (value === null ||
+        value === undefined) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+function escapeAttribute(value) {
+
+    if (value === null ||
+        value === undefined) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'");
+}
+
+
+
+/* =====================================================
+   START
+===================================================== */
 
 loadApps();
 
