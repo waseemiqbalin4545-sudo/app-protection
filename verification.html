@@ -1,1629 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Verification - App Protection</title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f6fa;
-            color: #111827;
-        }
-
-        /* =========================
-           SIDEBAR
-        ========================= */
-
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 180px;
-            height: 100vh;
-            background: #101827;
-            color: white;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            padding: 25px 20px;
-            line-height: 1.1;
-        }
-
-        .logo span {
-            color: #3b82f6;
-        }
-
-        .menu {
-            padding: 10px;
-        }
-
-        .menu a {
-            display: block;
-            text-decoration: none;
-            color: #d1d5db;
-            padding: 12px 14px;
-            margin-bottom: 6px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .menu a:hover {
-            background: #1f2937;
-            color: white;
-        }
-
-        .menu a.active {
-            background: #2563eb;
-            color: white;
-        }
-
-        /* =========================
-           MAIN
-        ========================= */
-
-        .main {
-            margin-left: 180px;
-            min-height: 100vh;
-        }
-
-        .topbar {
-            height: 58px;
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 25px;
-        }
-
-        .topbar-title {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .top-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: #2563eb;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-        }
-
-        .logout {
-            border: none;
-            background: #ef4444;
-            color: white;
-            padding: 9px 16px;
-            border-radius: 7px;
-            cursor: pointer;
-        }
-
-        .logout:hover {
-            background: #dc2626;
-        }
-
-        /* =========================
-           CONTENT
-        ========================= */
-
-        .content {
-            padding: 28px;
-        }
-
-        h1 {
-            font-size: 27px;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            color: #64748b;
-            margin-bottom: 25px;
-        }
-
-        /* =========================
-           CARD
-        ========================= */
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 3px 12px rgba(0,0,0,.05);
-        }
-
-        .card h2 {
-            font-size: 21px;
-            margin-bottom: 20px;
-        }
-
-        /* =========================
-           FORM
-        ========================= */
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr;
-            gap: 14px;
-        }
-
-        .field label {
-            display: block;
-            font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 7px;
-        }
-
-        input,
-        select {
-            width: 100%;
-            height: 42px;
-            border: 1px solid #d1d5db;
-            border-radius: 7px;
-            padding: 0 12px;
-            font-size: 14px;
-            background: white;
-            outline: none;
-        }
-
-        input:focus,
-        select:focus {
-            border-color: #2563eb;
-        }
-
-        .custom-code {
-            display: none;
-            margin-top: 14px;
-        }
-
-        .generate-area {
-            margin-top: 18px;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 7px;
-            padding: 10px 16px;
-            cursor: pointer;
-            font-weight: bold;
-            color: white;
-        }
-
-        .btn-blue {
-            background: #2563eb;
-        }
-
-        .btn-blue:hover {
-            background: #1d4ed8;
-        }
-
-        .btn-gray {
-            background: #475569;
-        }
-
-        .btn-green {
-            background: #16a34a;
-        }
-
-        .btn-red {
-            background: #ef4444;
-        }
-
-        .btn-small {
-            padding: 7px 10px;
-            font-size: 12px;
-        }
-
-        /* =========================
-           MESSAGE
-        ========================= */
-
-        .message {
-            display: none;
-            margin-top: 15px;
-            padding: 12px 14px;
-            border-radius: 7px;
-            font-size: 14px;
-        }
-
-        .message.success {
-            display: block;
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .message.error {
-            display: block;
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        /* =========================
-           TABLE
-        ========================= */
-
-        .table-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-            width: 100%;
-        }
-
-        table {
-            width: 100%;
-            min-width: 950px;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #334155;
-            font-size: 13px;
-            text-align: left;
-            padding: 13px 10px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        td {
-            padding: 13px 10px;
-            font-size: 13px;
-            border-bottom: 1px solid #e5e7eb;
-            vertical-align: middle;
-        }
-
-        .code {
-            display: inline-block;
-            background: #f1f5f9;
-            padding: 6px 9px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-weight: bold;
-            color: #0f172a;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 5px 9px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .status-active {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-disabled {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status-expired {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-used {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 35px;
-            color: #64748b;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 30px;
-            color: #64748b;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 6px;
-        }
-
-        /* =========================
-           MOBILE
-        ========================= */
-
-        @media(max-width: 900px) {
-
-            .sidebar {
-                width: 165px;
-            }
-
-            .main {
-                margin-left: 165px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-        }
-
-        @media(max-width: 650px) {
-
-            .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
-            }
-
-            .main {
-                margin-left: 0;
-            }
-
-            .menu {
-                display: flex;
-                overflow-x: auto;
-                padding: 8px;
-            }
-
-            .menu a {
-                white-space: nowrap;
-                margin-right: 5px;
-            }
-
-            .content {
-                padding: 15px;
-            }
-
-            .topbar {
-                padding: 0 15px;
-            }
-
-            .topbar-title {
-                font-size: 14px;
-            }
-
-            .content h1 {
-                font-size: 23px;
-            }
-
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Verification - App Protection</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f6fa;color:#111827}
+.sidebar{position:fixed;left:0;top:0;width:190px;height:100vh;background:#101827;color:#fff}
+.logo{font-size:20px;font-weight:bold;padding:25px 20px}.logo span{color:#3b82f6}
+.menu{padding:10px}.menu a{display:block;color:#d1d5db;text-decoration:none;padding:12px 14px;margin-bottom:6px;border-radius:8px}.menu a.active,.menu a:hover{background:#2563eb;color:#fff}
+.main{margin-left:190px;min-height:100vh}.topbar{height:60px;background:#fff;border-bottom:1px solid #ddd;display:flex;align-items:center;justify-content:space-between;padding:0 25px}
+.top-right{display:flex;align-items:center;gap:12px}.avatar{width:35px;height:35px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold}
+.logout,.btn{border:0;border-radius:7px;padding:9px 15px;cursor:pointer;color:#fff;font-weight:bold}.logout{background:#ef4444}
+.content{padding:28px}h1{font-size:27px;margin-bottom:5px}.subtitle{color:#64748b;margin-bottom:20px}
+.card{background:#fff;border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:0 3px 12px #0000000d}.card h2{margin-bottom:20px}
+.api-box{padding:12px 15px;background:#eff6ff;color:#1e40af;border-radius:8px;margin-bottom:20px;font-size:13px}
+.form-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px}.field label{display:block;font-size:13px;font-weight:bold;margin-bottom:7px}
+input,select{width:100%;height:42px;border:1px solid #d1d5db;border-radius:7px;padding:0 12px;font-size:14px;background:#fff}
+.custom-code{display:none;margin-top:14px}.generate-area{margin-top:18px}.btn-blue{background:#2563eb}.btn-gray{background:#475569}.btn-red{background:#ef4444}.btn:disabled{opacity:.6}
+.message{display:none;margin-top:15px;padding:12px;border-radius:7px}.message.success{display:block;background:#dcfce7;color:#166534}.message.error{display:block;background:#fee2e2;color:#991b1b}
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.table-wrap{overflow-x:auto}table{width:100%;min-width:1000px;border-collapse:collapse}
+th{background:#f8fafc;text-align:left;padding:13px 10px;border-bottom:1px solid #ddd;font-size:13px}td{padding:13px 10px;border-bottom:1px solid #eee;font-size:13px}
+.code{background:#f1f5f9;padding:6px 9px;border-radius:6px;font-family:monospace;font-weight:bold}.status{padding:5px 9px;border-radius:20px;font-size:11px;font-weight:bold}.status-active{background:#dcfce7;color:#166534}.status-disabled{background:#fee2e2;color:#991b1b}.status-expired{background:#fef3c7;color:#92400e}.status-used{background:#dbeafe;color:#1e40af}.status-other{background:#e5e7eb;color:#374151}
+.empty,.loading{text-align:center;padding:35px;color:#64748b}.action-buttons{display:flex;gap:6px}.btn-small{padding:7px 10px;font-size:12px}
+@media(max-width:900px){.sidebar{width:165px}.main{margin-left:165px}.form-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0}.menu{display:flex;overflow-x:auto}.menu a{white-space:nowrap;margin-right:5px}.content{padding:15px}.topbar{padding:0 15px}}
+</style>
 </head>
-
 <body>
 
-<!-- =====================================
-     SIDEBAR
-===================================== -->
-
 <div class="sidebar">
-
-    <div class="logo">
-        🛡️ App <span>Protection</span>
-    </div>
-
-    <div class="menu">
-
-        <a href="/dashboard.html">
-            🏠 Dashboard
-        </a>
-
-        <a href="/apps.html">
-            📱 Apps
-        </a>
-
-        <a href="/devices.html">
-            📟 Devices
-        </a>
-
-        <a href="/verification.html" class="active">
-            🔐 Verification
-        </a>
-
-        <a href="/settings.html">
-            ⚙️ Settings
-        </a>
-
-    </div>
-
+<div class="logo">🛡️ App <span>Protection</span></div>
+<div class="menu">
+<a href="/dashboard.html">🏠 Dashboard</a>
+<a href="/apps.html">📱 Apps</a>
+<a href="/devices.html">📟 Devices</a>
+<a href="/verification.html" class="active">🔐 Verification</a>
+<a href="/settings.html">⚙️ Settings</a>
 </div>
-
-
-<!-- =====================================
-     MAIN
-===================================== -->
+</div>
 
 <div class="main">
-
-    <!-- TOPBAR -->
-
-    <div class="topbar">
-
-        <div class="topbar-title">
-            Verification
-        </div>
-
-        <div class="top-right">
-
-            <span id="username">
-                admin
-            </span>
-
-            <div class="avatar" id="avatar">
-                A
-            </div>
-
-            <button class="logout" onclick="logout()">
-                Logout
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- CONTENT -->
-
-    <div class="content">
-
-        <h1>
-            Verification Codes
-        </h1>
-
-        <div class="subtitle">
-            Generate and manage application verification codes.
-        </div>
-
-
-        <!-- =================================
-             GENERATE CODE
-        ================================== -->
-
-        <div class="card">
-
-            <h2>
-                Generate Verification Code
-            </h2>
-
-            <div class="form-grid">
-
-                <!-- APP -->
-
-                <div class="field">
-
-                    <label>
-                        Select App
-                    </label>
-
-                    <select id="appSelect">
-
-                        <option value="">
-                            Loading apps...
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <!-- CODE TYPE -->
-
-                <div class="field">
-
-                    <label>
-                        Code Type
-                    </label>
-
-                    <select id="codeType"
-                            onchange="codeTypeChanged()">
-
-                        <option value="random">
-                            Random Code
-                        </option>
-
-                        <option value="custom">
-                            Custom Code
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <!-- EXPIRY -->
-
-                <div class="field">
-
-                    <label>
-                        Expiry Hours
-                    </label>
-
-                    <input
-                        type="number"
-                        id="expiryHours"
-                        value="24"
-                        min="1"
-                        step="1"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <!-- CUSTOM CODE -->
-
-            <div
-                class="custom-code"
-                id="customCodeBox">
-
-                <div class="field">
-
-                    <label>
-                        Custom Verification Code
-                    </label>
-
-                    <input
-                        type="text"
-                        id="customCode"
-                        placeholder="Example: VIP-2026-001"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <!-- GENERATE -->
-
-            <div class="generate-area">
-
-                <button
-                    class="btn btn-blue"
-                    id="generateBtn"
-                    onclick="generateCode()">
-
-                    🔐 Generate Code
-
-                </button>
-
-            </div>
-
-
-            <div
-                id="message"
-                class="message">
-            </div>
-
-        </div>
-
-
-        <!-- =================================
-             CODE HISTORY
-        ================================== -->
-
-        <div class="card">
-
-            <div class="table-header">
-
-                <h2 style="margin:0;">
-                    Code History
-                </h2>
-
-                <button
-                    class="btn btn-gray"
-                    onclick="loadCodes()">
-
-                    🔄 Refresh
-
-                </button>
-
-            </div>
-
-
-            <div class="table-wrap">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>ID</th>
-
-                            <th>Code</th>
-
-                            <th>App</th>
-
-                            <th>Package</th>
-
-                            <th>Created</th>
-
-                            <th>Expiry</th>
-
-                            <th>Status</th>
-
-                            <th>Used At</th>
-
-                            <th>Action</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody id="codeTable">
-
-                        <tr>
-
-                            <td
-                                colspan="9"
-                                class="loading">
-
-                                Loading...
-
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </div>
-
+<div class="topbar">
+<div><b>Verification</b></div>
+<div class="top-right"><span id="username">admin</span><div class="avatar" id="avatar">A</div><button class="logout" onclick="logout()">Logout</button></div>
 </div>
 
+<div class="content">
+<h1>Verification Codes</h1>
+<div class="subtitle">Generate and manage application verification codes.</div>
+
+<div class="api-box">Verification API: <b>/api/verify</b></div>
+
+<div class="card">
+<h2>Generate Verification Code</h2>
+<div class="form-grid">
+<div class="field"><label>Select App</label><select id="appSelect"><option value="">Loading apps...</option></select></div>
+<div class="field"><label>Code Type</label><select id="codeType" onchange="codeTypeChanged()"><option value="random">Random Code</option><option value="custom">Custom Code</option></select></div>
+<div class="field"><label>Expiry Hours</label><input type="number" id="expiryHours" value="24" min="1"></div>
+</div>
+<div class="custom-code" id="customCodeBox"><div class="field"><label>Custom Verification Code</label><input id="customCode" placeholder="Example: VIP-2026-001"></div></div>
+<div class="generate-area"><button class="btn btn-blue" id="generateBtn" onclick="generateCode()">🔐 Generate Code</button></div>
+<div id="message" class="message"></div>
+</div>
+
+<div class="card">
+<div class="table-header"><h2>Code History</h2><button class="btn btn-gray" onclick="loadCodes()">🔄 Refresh</button></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ID</th><th>Code</th><th>App</th><th>Package</th><th>Created</th><th>Expiry</th><th>Status</th><th>Used At</th><th>Action</th></tr></thead>
+<tbody id="codeTable"><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
 
 <script>
+const API="/api";
 
-/* =========================================
-   API
-========================================= */
+function token(){return localStorage.getItem("token")}
+function logout(){localStorage.removeItem("token");localStorage.removeItem("admin");location.href="/login.html"}
 
-const API = "/api";
-
-
-/* =========================================
-   AUTH
-========================================= */
-
-let token = localStorage.getItem("token");
-
-if (!token) {
-
-    window.location.href = "/login.html";
-
+function loadAdmin(){
+try{
+const a=JSON.parse(localStorage.getItem("admin")||"{}");
+if(a.username){username.textContent=a.username;avatar.textContent=a.username.charAt(0).toUpperCase()}
+}catch(e){}
 }
 
-
-/* =========================================
-   ADMIN INFO
-========================================= */
-
-try {
-
-    const admin =
-        JSON.parse(
-            localStorage.getItem("admin") || "{}"
-        );
-
-    if (admin.username) {
-
-        document.getElementById("username")
-            .textContent = admin.username;
-
-        document.getElementById("avatar")
-            .textContent =
-            admin.username
-                .charAt(0)
-                .toUpperCase();
-
-    }
-
-} catch (e) {
-
-    console.log(e);
-
+async function apiRequest(url,options={}){
+const t=token();
+if(!t){logout();return null}
+options.headers={...(options.headers||{}),"Authorization":"Bearer "+t,"Content-Type":"application/json"};
+const r=await fetch(API+url,options);
+let d;
+try{d=await r.json()}catch(e){throw new Error("Invalid server response")}
+if(r.status===401){alert(d.message||"Session expired");logout();return null}
+return d;
 }
 
-
-/* =========================================
-   API REQUEST
-========================================= */
-
-async function apiRequest(url, options = {}) {
-
-    const currentToken =
-        localStorage.getItem("token");
-
-    if (!currentToken) {
-
-        logout();
-
-        return null;
-
-    }
-
-    options.headers = {
-
-        ...(options.headers || {}),
-
-        "Authorization":
-            "Bearer " + currentToken,
-
-        "Content-Type":
-            "application/json"
-
-    };
-
-
-    const response =
-        await fetch(API + url, options);
-
-
-    let data;
-
-    try {
-
-        data = await response.json();
-
-    } catch {
-
-        throw new Error(
-            "Invalid server response"
-        );
-
-    }
-
-
-    if (response.status === 401) {
-
-        logout();
-
-        return null;
-
-    }
-
-
-    return data;
-
+/* GET /api/apps/all */
+async function loadApps(){
+const s=document.getElementById("appSelect");
+try{
+const r=await apiRequest("/apps/all");
+if(!r)return;
+if(!r.success){s.innerHTML="<option>"+esc(r.message||"Unable to load apps")+"</option>";return}
+if(!Array.isArray(r.data)||!r.data.length){s.innerHTML="<option value=''>No Apps Found</option>";return}
+s.innerHTML="<option value=''>Select App</option>";
+r.data.forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent=`${a.app_name} (${a.package_name})`;s.appendChild(o)})
+}catch(e){console.error(e);s.innerHTML="<option>Server Error</option>"}
 }
 
+function codeTypeChanged(){customCodeBox.style.display=codeType.value==="custom"?"block":"none"}
 
-/* =========================================
-   LOAD APPS
-========================================= */
+function msg(text,type){message.textContent=text;message.className="message "+type;setTimeout(()=>{message.className="message";message.textContent=""},4000)}
 
-async function loadApps() {
+async function generateCode(){
+const appId=appSelect.value,type=codeType.value,h=Number(expiryHours.value),custom=customCode.value.trim();
+if(!appId)return msg("Please select an app.","error");
+if(!h||h<=0)return msg("Please enter valid expiry hours.","error");
+if(type==="custom"&&!custom)return msg("Please enter custom code.","error");
 
-    const select =
-        document.getElementById("appSelect");
-
-
-    try {
-
-        const result =
-            await apiRequest("/apps/all");
-
-
-        if (!result) {
-            return;
-        }
-
-
-        if (!result.success) {
-
-            select.innerHTML =
-                `<option value="">
-                    ${escapeHtml(
-                        result.message ||
-                        "Unable to load apps"
-                    )}
-                </option>`;
-
-            return;
-
-        }
-
-
-        if (!result.data ||
-            result.data.length === 0) {
-
-            select.innerHTML =
-                `<option value="">
-                    No Apps Found
-                </option>`;
-
-            return;
-
-        }
-
-
-        select.innerHTML =
-            `<option value="">
-                Select App
-            </option>`;
-
-
-        result.data.forEach(app => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = app.id;
-
-            option.textContent =
-                `${app.app_name} (${app.package_name})`;
-
-            select.appendChild(option);
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            "LOAD APPS ERROR:",
-            error
-        );
-
-        select.innerHTML =
-            `<option value="">
-                Server Error
-            </option>`;
-
-    }
-
+generateBtn.disabled=true;generateBtn.textContent="Generating...";
+try{
+const body={app_id:Number(appId),expiry_hours:h,code:type==="custom"?custom:""};
+const r=await apiRequest("/verify/generate",{method:"POST",body:JSON.stringify(body)});
+if(!r)return;
+if(!r.success)return msg(r.message||"Unable to generate code.","error");
+msg(r.message||"Verification Code Generated","success");
+customCode.value="";codeType.value="random";codeTypeChanged();await loadCodes();
+}catch(e){msg(e.message||"Server Error","error")}
+finally{generateBtn.disabled=false;generateBtn.textContent="🔐 Generate Code"}
 }
 
-
-/* =========================================
-   CODE TYPE
-========================================= */
-
-function codeTypeChanged() {
-
-    const type =
-        document.getElementById("codeType").value;
-
-    const box =
-        document.getElementById(
-            "customCodeBox"
-        );
-
-
-    if (type === "custom") {
-
-        box.style.display = "block";
-
-    } else {
-
-        box.style.display = "none";
-
-    }
-
+/* GET /api/verify/all */
+async function loadCodes(){
+codeTable.innerHTML='<tr><td colspan="9" class="loading">Loading...</td></tr>';
+try{
+const r=await apiRequest("/verify/all");
+if(!r)return;
+if(!r.success){codeTable.innerHTML=`<tr><td colspan="9" class="empty">${esc(r.message||"Unable to load codes")}</td></tr>`;return}
+if(!Array.isArray(r.data)||!r.data.length){codeTable.innerHTML='<tr><td colspan="9" class="empty">No verification codes found.</td></tr>';return}
+codeTable.innerHTML=r.data.map(row).join("");
+}catch(e){console.error(e);codeTable.innerHTML=`<tr><td colspan="9" class="empty">${esc(e.message||"Server Error")}</td></tr>`}
 }
 
-
-/* =========================================
-   GENERATE CODE
-========================================= */
-
-async function generateCode() {
-
-    const appId =
-        document.getElementById(
-            "appSelect"
-        ).value;
-
-
-    const codeType =
-        document.getElementById(
-            "codeType"
-        ).value;
-
-
-    const expiryHours =
-        document.getElementById(
-            "expiryHours"
-        ).value;
-
-
-    const customCode =
-        document.getElementById(
-            "customCode"
-        ).value.trim();
-
-
-    const message =
-        document.getElementById(
-            "message"
-        );
-
-
-    const button =
-        document.getElementById(
-            "generateBtn"
-        );
-
-
-    message.className = "message";
-    message.textContent = "";
-
-
-    /* APP CHECK */
-
-    if (!appId) {
-
-        showMessage(
-            "Please select an app.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    /* EXPIRY CHECK */
-
-    if (!expiryHours ||
-        Number(expiryHours) <= 0) {
-
-        showMessage(
-            "Please enter valid expiry hours.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    /* CUSTOM CODE CHECK */
-
-    if (codeType === "custom" &&
-        !customCode) {
-
-        showMessage(
-            "Please enter custom code.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    button.disabled = true;
-
-    button.textContent =
-        "Generating...";
-
-
-    try {
-
-        const body = {
-
-            app_id: Number(appId),
-
-            expiry_hours:
-                Number(expiryHours)
-
-        };
-
-
-        if (codeType === "custom") {
-
-            body.code = customCode;
-
-        } else {
-
-            body.code = "";
-
-        }
-
-
-        const result =
-            await apiRequest(
-                "/verify/generate",
-                {
-                    method: "POST",
-                    body: JSON.stringify(body)
-                }
-            );
-
-
-        if (!result) {
-            return;
-        }
-
-
-        if (!result.success) {
-
-            showMessage(
-                result.message ||
-                "Unable to generate code.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        showMessage(
-            result.message ||
-            "Verification Code Generated",
-            "success"
-        );
-
-
-        /* RESET */
-
-        document.getElementById(
-            "customCode"
-        ).value = "";
-
-
-        document.getElementById(
-            "codeType"
-        ).value = "random";
-
-
-        codeTypeChanged();
-
-
-        /* RELOAD */
-
-        await loadCodes();
-
-
-    } catch (error) {
-
-        console.error(
-            "GENERATE ERROR:",
-            error
-        );
-
-        showMessage(
-            error.message ||
-            "Server Error",
-            "error"
-        );
-
-    } finally {
-
-        button.disabled = false;
-
-        button.textContent =
-            "🔐 Generate Code";
-
-    }
-
+function row(c){
+const st=String(c.status||"").toLowerCase();
+let cls=st==="active"?"status-active":st==="disabled"?"status-disabled":st==="expired"?"status-expired":st==="used"?"status-used":"status-other";
+let actions="";
+if(st!=="disabled"&&st!=="expired")actions+=`<button class="btn btn-red btn-small" onclick="disableCode(${Number(c.id)})">Disable</button>`;
+actions+=`<button class="btn btn-red btn-small" onclick="deleteCode(${Number(c.id)})">Delete</button>`;
+return `<tr>
+<td>${esc(c.id)}</td><td><span class="code">${esc(c.code)}</span></td>
+<td>${esc(c.app_name||"-")}</td><td>${esc(c.package_name||"-")}</td>
+<td>${date(c.created_at)}</td><td>${date(c.expires_at)}</td>
+<td><span class="status ${cls}">${esc(c.status||"-")}</span></td>
+<td>${date(c.used_at)}</td><td><div class="action-buttons">${actions}</div></td>
+</tr>`
 }
 
-
-/* =========================================
-   LOAD CODE HISTORY
-========================================= */
-
-async function loadCodes() {
-
-    const tbody =
-        document.getElementById(
-            "codeTable"
-        );
-
-
-    tbody.innerHTML = `
-        <tr>
-            <td colspan="9" class="loading">
-                Loading...
-            </td>
-        </tr>
-    `;
-
-
-    try {
-
-        const result =
-            await apiRequest(
-                "/verify/all"
-            );
-
-
-        if (!result) {
-            return;
-        }
-
-
-        if (!result.success) {
-
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="9"
-                        class="empty">
-                        ${escapeHtml(
-                            result.message ||
-                            "Unable to load codes"
-                        )}
-                    </td>
-                </tr>
-            `;
-
-            return;
-
-        }
-
-
-        if (!result.data ||
-            result.data.length === 0) {
-
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="9"
-                        class="empty">
-                        No verification codes found.
-                    </td>
-                </tr>
-            `;
-
-            return;
-
-        }
-
-
-        tbody.innerHTML =
-            result.data
-                .map(code => createCodeRow(code))
-                .join("");
-
-
-    } catch (error) {
-
-        console.error(
-            "LOAD CODES ERROR:",
-            error
-        );
-
-
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="9"
-                    class="empty">
-                    Server Error
-                </td>
-            </tr>
-        `;
-
-    }
-
+/* POST /api/verify/disable/:id */
+async function disableCode(id){
+if(!confirm("Disable this verification code?"))return;
+try{
+const r=await apiRequest("/verify/disable/"+id,{method:"POST"});
+if(!r)return;if(!r.success)return msg(r.message||"Unable to disable code.","error");
+msg(r.message||"Verification Code Disabled","success");await loadCodes();
+}catch(e){msg(e.message||"Server Error","error")}
 }
 
-
-/* =========================================
-   CREATE TABLE ROW
-========================================= */
-
-function createCodeRow(code) {
-
-    const status =
-        String(code.status || "")
-            .toLowerCase();
-
-
-    let statusClass =
-        "status-active";
-
-
-    if (status === "disabled") {
-
-        statusClass =
-            "status-disabled";
-
-    }
-
-    if (status === "expired") {
-
-        statusClass =
-            "status-expired";
-
-    }
-
-    if (status === "used") {
-
-        statusClass =
-            "status-used";
-
-    }
-
-
-    let action = "";
-
-
-    if (
-        status !== "disabled" &&
-        status !== "expired"
-    ) {
-
-        action += `
-            <button
-                class="btn btn-red btn-small"
-                onclick="disableCode(${code.id})">
-                Disable
-            </button>
-        `;
-
-    }
-
-
-    action += `
-        <button
-            class="btn btn-red btn-small"
-            onclick="deleteCode(${code.id})">
-            Delete
-        </button>
-    `;
-
-
-    return `
-
-        <tr>
-
-            <td>
-                ${escapeHtml(code.id)}
-            </td>
-
-
-            <td>
-
-                <span class="code">
-                    ${escapeHtml(code.code)}
-                </span>
-
-            </td>
-
-
-            <td>
-                ${escapeHtml(
-                    code.app_name || "-"
-                )}
-            </td>
-
-
-            <td>
-                ${escapeHtml(
-                    code.package_name || "-"
-                )}
-            </td>
-
-
-            <td>
-                ${formatDate(
-                    code.created_at
-                )}
-            </td>
-
-
-            <td>
-                ${formatDate(
-                    code.expires_at
-                )}
-            </td>
-
-
-            <td>
-
-                <span class="status ${statusClass}">
-                    ${escapeHtml(
-                        code.status || "-"
-                    )}
-                </span>
-
-            </td>
-
-
-            <td>
-                ${formatDate(
-                    code.used_at
-                )}
-            </td>
-
-
-            <td>
-
-                <div class="action-buttons">
-
-                    ${action}
-
-                </div>
-
-            </td>
-
-        </tr>
-
-    `;
-
+/* DELETE /api/verify/:id */
+async function deleteCode(id){
+if(!confirm("Delete this verification code permanently?"))return;
+try{
+const r=await apiRequest("/verify/"+id,{method:"DELETE"});
+if(!r)return;if(!r.success)return msg(r.message||"Unable to delete code.","error");
+msg(r.message||"Verification Code Deleted","success");await loadCodes();
+}catch(e){msg(e.message||"Server Error","error")}
 }
 
-
-/* =========================================
-   DISABLE CODE
-========================================= */
-
-async function disableCode(id) {
-
-    if (!confirm(
-        "Disable this verification code?"
-    )) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const result =
-            await apiRequest(
-                "/verify/disable/" + id,
-                {
-                    method: "POST"
-                }
-            );
-
-
-        if (!result) {
-            return;
-        }
-
-
-        if (!result.success) {
-
-            showMessage(
-                result.message ||
-                "Unable to disable code.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        showMessage(
-            result.message ||
-            "Verification Code Disabled",
-            "success"
-        );
-
-
-        await loadCodes();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        showMessage(
-            error.message ||
-            "Server Error",
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================
-   DELETE CODE
-========================================= */
-
-async function deleteCode(id) {
-
-    if (!confirm(
-        "Delete this verification code permanently?"
-    )) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const result =
-            await apiRequest(
-                "/verify/" + id,
-                {
-                    method: "DELETE"
-                }
-            );
-
-
-        if (!result) {
-            return;
-        }
-
-
-        if (!result.success) {
-
-            showMessage(
-                result.message ||
-                "Unable to delete code.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        showMessage(
-            result.message ||
-            "Verification Code Deleted",
-            "success"
-        );
-
-
-        await loadCodes();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        showMessage(
-            error.message ||
-            "Server Error",
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================
-   MESSAGE
-========================================= */
-
-function showMessage(text, type) {
-
-    const message =
-        document.getElementById(
-            "message"
-        );
-
-
-    message.textContent = text;
-
-    message.className =
-        "message " + type;
-
-
-    setTimeout(() => {
-
-        message.className =
-            "message";
-
-    }, 4000);
-
-}
-
-
-/* =========================================
-   DATE FORMAT
-========================================= */
-
-function formatDate(value) {
-
-    if (!value) {
-        return "-";
-    }
-
-
-    const date =
-        new Date(value);
-
-
-    if (isNaN(date.getTime())) {
-
-        return escapeHtml(
-            String(value)
-        );
-
-    }
-
-
-    return date.toLocaleString();
-
-}
-
-
-/* =========================================
-   HTML ESCAPE
-========================================= */
-
-function escapeHtml(value) {
-
-    if (value === null ||
-        value === undefined) {
-
-        return "";
-
-    }
-
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-}
-
-
-/* =========================================
-   LOGOUT
-========================================= */
-
-function logout() {
-
-    localStorage.removeItem("token");
-
-    localStorage.removeItem("admin");
-
-    window.location.href =
-        "/login.html";
-
-}
-
-
-/* =========================================
-   START
-========================================= */
-
-loadApps();
-
-loadCodes();
-
+function date(v){if(!v)return"-";const d=new Date(v);return isNaN(d)?"-":d.toLocaleString()}
+function esc(v){return v==null?"":String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+
+document.addEventListener("DOMContentLoaded",async()=>{
+if(!token()){location.href="/login.html";return}
+loadAdmin();codeTypeChanged();await loadApps();await loadCodes();
+});
 </script>
-
 </body>
 </html>
