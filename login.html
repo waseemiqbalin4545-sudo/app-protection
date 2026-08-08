@@ -235,14 +235,19 @@ form.addEventListener("submit", async function(e) {
 
         if (data.success) {
 
-            localStorage.setItem("token", data.token);
-            localStorage.setItem(
-                "admin",
-                JSON.stringify(data.admin)
-            );
+    localStorage.setItem("token", data.token);
 
-            message.className = "message success";
-            message.textContent = "Login Successful!";
+    localStorage.setItem(
+        "admin",
+        JSON.stringify(data.admin)
+    );
+
+    message.className = "message success";
+    message.textContent = "Login Successful!";
+
+    setTimeout(() => {
+        window.location.href = "/dashboard.html";
+    }, 500);
 
             /*
              * Abhi dashboard page nahi banaya,
