@@ -6,6 +6,7 @@ const { isExpired } = require("../utils/expiry");
 
 // ======================================================
 // ANDROID APP VERIFICATION
+// POST /api/verify
 // ======================================================
 
 exports.verify = async (req, res) => {
@@ -38,7 +39,7 @@ exports.verify = async (req, res) => {
 
 
         // ----------------------------------------------
-        // Check App
+        // Find App
         // ----------------------------------------------
 
         const appResult = await db.query(
@@ -74,7 +75,11 @@ exports.verify = async (req, res) => {
         // App Status
         // ----------------------------------------------
 
-        if (!app.status) {
+        if (
+            app.status === false ||
+            app.status === "OFF" ||
+            app.status === "Disabled"
+        ) {
 
             return res.json({
                 success: false,
@@ -85,7 +90,7 @@ exports.verify = async (req, res) => {
 
 
         // ----------------------------------------------
-        // Check Device
+        // Find Device
         // ----------------------------------------------
 
         const deviceResult = await db.query(
@@ -149,7 +154,6 @@ exports.verify = async (req, res) => {
             return res.json({
 
                 success: false,
-
                 message: "Pending Approval"
 
             });
@@ -169,7 +173,6 @@ exports.verify = async (req, res) => {
             return res.json({
 
                 success: false,
-
                 message: "Device Blocked"
 
             });
@@ -186,7 +189,6 @@ exports.verify = async (req, res) => {
             return res.json({
 
                 success: false,
-
                 message: "Pending Approval"
 
             });
@@ -195,7 +197,7 @@ exports.verify = async (req, res) => {
 
 
         // ----------------------------------------------
-        // Expiry Check
+        // Check Expiry
         // ----------------------------------------------
 
         if (device.active_until) {
@@ -205,7 +207,6 @@ exports.verify = async (req, res) => {
                 return res.json({
 
                     success: false,
-
                     message: "Activation Expired"
 
                 });
@@ -235,7 +236,7 @@ exports.verify = async (req, res) => {
 
 
         // ----------------------------------------------
-        // Verification Successful
+        // Success
         // ----------------------------------------------
 
         return res.json({
@@ -271,7 +272,7 @@ exports.verify = async (req, res) => {
 
             success: false,
 
-            message: "Server Error"
+            message: err.message || "Server Error"
 
         });
 
@@ -298,16 +299,34 @@ exports.generateCode = async (req, res) => {
 
 
         // ----------------------------------------------
-        // Validate App
+        // Validate App ID
         // ----------------------------------------------
 
-        if (!app_id) {
+        if (
+            app_id === undefined ||
+            app_id === null ||
+            app_id === ""
+        ) {
 
             return res.status(400).json({
 
                 success: false,
-
                 message: "App ID Required"
+
+            });
+
+        }
+
+
+        const appId = Number(app_id);
+
+
+        if (!Number.isInteger(appId) || appId <= 0) {
+
+            return res.status(400).json({
+
+                success: false,
+                message: "Invalid App ID"
 
             });
 
@@ -320,12 +339,15 @@ exports.generateCode = async (req, res) => {
 
         const hours = Number(expiry_hours);
 
-        if (!Number.isFinite(hours) || hours <= 0) {
+
+        if (
+            !Number.isFinite(hours) ||
+            hours <= 0
+        ) {
 
             return res.status(400).json({
 
                 success: false,
-
                 message: "Valid Expiry Hours Required"
 
             });
@@ -334,18 +356,22 @@ exports.generateCode = async (req, res) => {
 
 
         // ----------------------------------------------
-        // Check App Exists
+        // Find App
         // ----------------------------------------------
 
         const appResult = await db.query(
 
-            `SELECT id, app_name, package_name
+            `SELECT
+                id,
+                app_name,
+                package_name,
+                status
              FROM apps
              WHERE id=$1
              LIMIT 1`,
 
             [
-                app_id
+                appId
             ]
 
         );
@@ -356,7 +382,6 @@ exports.generateCode = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
-
                 message: "App Not Found"
 
             });
@@ -364,14 +389,20 @@ exports.generateCode = async (req, res) => {
         }
 
 
+        const app = appResult.rows[0];
+
+
         // ----------------------------------------------
-        // Generate Random Code
+        // Generate Code
         // ----------------------------------------------
 
         let verificationCode;
 
 
-        if (code && String(code).trim() !== "") {
+        if (
+            code &&
+            String(code).trim() !== ""
+        ) {
 
             verificationCode = String(code)
                 .trim()
@@ -390,13 +421,14 @@ exports.generateCode = async (req, res) => {
                 .toString("hex")
                 .toUpperCase();
 
-            verificationCode = `AP-${part1}-${part2}`;
+            verificationCode =
+                `AP-${part1}-${part2}`;
 
         }
 
 
         // ----------------------------------------------
-        // Check Duplicate Code
+        // Check Duplicate
         // ----------------------------------------------
 
         const duplicate = await db.query(
@@ -418,7 +450,6 @@ exports.generateCode = async (req, res) => {
             return res.status(409).json({
 
                 success: false,
-
                 message: "Code Already Exists"
 
             });
@@ -427,7 +458,16 @@ exports.generateCode = async (req, res) => {
 
 
         // ----------------------------------------------
-        // Create Code
+        // Calculate Expiry
+        // ----------------------------------------------
+
+        const expiresAt = new Date(
+            Date.now() + (hours * 60 * 60 * 1000)
+        );
+
+
+        // ----------------------------------------------
+        // Insert Code
         // ----------------------------------------------
 
         const result = await db.query(
@@ -446,23 +486,25 @@ exports.generateCode = async (req, res) => {
                 $1,
                 $2,
                 $3,
-                NOW() + ($3 * INTERVAL '1 hour'),
-                'Active',
+                $4,
+                $5,
                 NOW()
             )
             RETURNING *`,
 
             [
-                app_id,
+                appId,
                 verificationCode,
-                hours
+                hours,
+                expiresAt,
+                "Active"
             ]
 
         );
 
 
         // ----------------------------------------------
-        // Response
+        // Success
         // ----------------------------------------------
 
         return res.status(201).json({
@@ -475,9 +517,9 @@ exports.generateCode = async (req, res) => {
 
                 ...result.rows[0],
 
-                app_name: appResult.rows[0].app_name,
+                app_name: app.app_name,
 
-                package_name: appResult.rows[0].package_name
+                package_name: app.package_name
 
             }
 
@@ -486,13 +528,18 @@ exports.generateCode = async (req, res) => {
 
     } catch (err) {
 
-        console.error("GENERATE CODE ERROR:", err);
+        console.error(
+            "GENERATE CODE ERROR:",
+            err
+        );
 
         return res.status(500).json({
 
             success: false,
 
-            message: "Server Error"
+            // IMPORTANT:
+            // Actual PostgreSQL error will be shown
+            message: err.message || "Server Error"
 
         });
 
@@ -536,13 +583,10 @@ exports.getCodes = async (req, res) => {
         );
 
 
-        // ----------------------------------------------
-        // Automatically mark expired codes
-        // ----------------------------------------------
-
         const codes = result.rows.map((item) => {
 
             let status = item.status;
+
 
             if (
                 status === "Active" &&
@@ -554,9 +598,13 @@ exports.getCodes = async (req, res) => {
 
             }
 
+
             return {
+
                 ...item,
+
                 status
+
             };
 
         });
@@ -575,13 +623,16 @@ exports.getCodes = async (req, res) => {
 
     } catch (err) {
 
-        console.error("GET CODES ERROR:", err);
+        console.error(
+            "GET CODES ERROR:",
+            err
+        );
 
         return res.status(500).json({
 
             success: false,
 
-            message: "Server Error"
+            message: err.message || "Server Error"
 
         });
 
@@ -600,17 +651,26 @@ exports.disableCode = async (req, res) => {
 
     try {
 
-        const id = req.params.id;
+        const id = Number(req.params.id);
+
+
+        if (!Number.isInteger(id) || id <= 0) {
+
+            return res.status(400).json({
+
+                success: false,
+                message: "Invalid Code ID"
+
+            });
+
+        }
 
 
         const result = await db.query(
 
             `UPDATE verification_codes
-
              SET status='Disabled'
-
              WHERE id=$1
-
              RETURNING *`,
 
             [
@@ -625,7 +685,6 @@ exports.disableCode = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
-
                 message: "Code Not Found"
 
             });
@@ -646,13 +705,16 @@ exports.disableCode = async (req, res) => {
 
     } catch (err) {
 
-        console.error("DISABLE CODE ERROR:", err);
+        console.error(
+            "DISABLE CODE ERROR:",
+            err
+        );
 
         return res.status(500).json({
 
             success: false,
 
-            message: "Server Error"
+            message: err.message || "Server Error"
 
         });
 
@@ -671,15 +733,25 @@ exports.deleteCode = async (req, res) => {
 
     try {
 
-        const id = req.params.id;
+        const id = Number(req.params.id);
+
+
+        if (!Number.isInteger(id) || id <= 0) {
+
+            return res.status(400).json({
+
+                success: false,
+                message: "Invalid Code ID"
+
+            });
+
+        }
 
 
         const result = await db.query(
 
             `DELETE FROM verification_codes
-
              WHERE id=$1
-
              RETURNING id`,
 
             [
@@ -694,7 +766,6 @@ exports.deleteCode = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
-
                 message: "Code Not Found"
 
             });
@@ -713,13 +784,16 @@ exports.deleteCode = async (req, res) => {
 
     } catch (err) {
 
-        console.error("DELETE CODE ERROR:", err);
+        console.error(
+            "DELETE CODE ERROR:",
+            err
+        );
 
         return res.status(500).json({
 
             success: false,
 
-            message: "Server Error"
+            message: err.message || "Server Error"
 
         });
 
