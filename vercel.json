@@ -1,6 +1,5 @@
 {
   "version": 2,
-
   "builds": [
     {
       "src": "server.js",
@@ -8,46 +7,75 @@
       "config": {
         "includeFiles": [
           "login.html",
-          "dashboard.html"
+          "dashboard.html",
+          "apps.html",
+          "devices.html",
+          "verification.html",
+          "settings.html"
         ]
       }
     },
-
     {
       "src": "login.html",
       "use": "@vercel/static"
     },
-
     {
       "src": "dashboard.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "apps.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "devices.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "verification.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "settings.html",
+      "use": "@vercel/static"
     }
   ],
-
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "/server.js"
     },
-
     {
       "src": "/health",
       "dest": "/server.js"
     },
-
     {
       "src": "/",
       "dest": "/server.js"
     },
-
     {
       "src": "/login.html",
       "dest": "/login.html"
     },
-
     {
       "src": "/dashboard.html",
       "dest": "/dashboard.html"
+    },
+    {
+      "src": "/apps.html",
+      "dest": "/apps.html"
+    },
+    {
+      "src": "/devices.html",
+      "dest": "/devices.html"
+    },
+    {
+      "src": "/verification.html",
+      "dest": "/verification.html"
+    },
+    {
+      "src": "/settings.html",
+      "dest": "/settings.html"
     }
   ]
 }
