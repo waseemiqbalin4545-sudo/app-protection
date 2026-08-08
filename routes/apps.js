@@ -1,32 +1,102 @@
 const express = require("express");
+
 const router = express.Router();
 
 const auth = require("../middleware/auth");
-const appController = require("../controllers/appController");
+
+const appController =
+    require("../controllers/appController");
 
 
-// Add App
-router.post("/add", auth, appController.addApp);
+
+/*
+========================================
+ADD
+POST /api/apps/add
+========================================
+*/
+
+router.post(
+    "/add",
+    auth,
+    appController.addApp
+);
 
 
-// All Apps
-router.get("/all", auth, appController.getApps);
+
+/*
+========================================
+ALL
+GET /api/apps/all
+========================================
+*/
+
+router.get(
+    "/all",
+    auth,
+    appController.getApps
+);
 
 
-// Single App
-router.get("/:id", auth, appController.getApp);
+
+/*
+========================================
+SINGLE
+GET /api/apps/:id
+========================================
+*/
+
+router.get(
+    "/:id",
+    auth,
+    appController.getApp
+);
 
 
-// Edit App
-router.put("/:id", auth, appController.updateApp);
+
+/*
+========================================
+UPDATE
+PUT /api/apps/:id
+========================================
+*/
+
+router.put(
+    "/:id",
+    auth,
+    appController.updateApp
+);
 
 
-// ON / OFF
-router.patch("/:id/status", auth, appController.updateStatus);
+
+/*
+========================================
+STATUS
+PATCH /api/apps/:id/status
+========================================
+*/
+
+router.patch(
+    "/:id/status",
+    auth,
+    appController.updateStatus
+);
 
 
-// Delete App
-router.delete("/:id", auth, appController.deleteApp);
+
+/*
+========================================
+DELETE
+DELETE /api/apps/:id
+========================================
+*/
+
+router.delete(
+    "/:id",
+    auth,
+    appController.deleteApp
+);
+
 
 
 module.exports = router;
