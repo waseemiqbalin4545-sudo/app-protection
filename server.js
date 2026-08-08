@@ -14,52 +14,111 @@ const dashboardRoutes = require("./routes/dashboard");
 const app = express();
 
 app.use(cors());
+
 app.use(express.json());
 
-// Database Test
+/*
+=====================================
+Database Test
+=====================================
+*/
+
 db.query("SELECT NOW()")
-  .then(() => {
+.then(() => {
+
     console.log("✅ PostgreSQL Connected");
-  })
-  .catch((err) => {
-    console.error(err);
-  });
 
-// Home
-app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    project: "App Protection API",
-    version: "3.0",
-    database: "Connected"
-  });
+})
+.catch((err) => {
+
+    console.log(err);
+
 });
 
-// Health
-app.get("/health", (req, res) => {
-  res.json({
-    success: true,
-    status: "online"
-  });
+/*
+=====================================
+Home
+=====================================
+*/
+
+app.get("/", (req,res)=>{
+
+    res.json({
+
+        success:true,
+
+        project:"App Protection API",
+
+        version:"3.0",
+
+        database:"Connected"
+
+    });
+
 });
 
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/apps", appRoutes);
-app.use("/api/devices", deviceRoutes);
-app.use("/api/verify", verifyRoutes);
-app.use("/api/dashboard", dashboardRoutes);
+/*
+=====================================
+Health
+=====================================
+*/
 
-// 404
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "API Not Found"
-  });
+app.get("/health",(req,res)=>{
+
+    res.json({
+
+        success:true,
+
+        status:"online"
+
+    });
+
 });
 
-const PORT = process.env.PORT || 3000;
+/*
+=====================================
+Routes
+=====================================
+*/
 
-app.listen(PORT, () => {
-  console.log(`Server Running On Port ${PORT}`);
+app.use("/api/auth",authRoutes);
+
+app.use("/api/apps",appRoutes);
+
+app.use("/api/devices",deviceRoutes);
+
+app.use("/api/verify",verifyRoutes);
+
+app.use("/api/dashboard",dashboardRoutes);
+
+/*
+=====================================
+404
+=====================================
+*/
+
+app.use((req,res)=>{
+
+    res.status(404).json({
+
+        success:false,
+
+        message:"API Not Found"
+
+    });
+
+});
+
+/*
+=====================================
+Server
+=====================================
+*/
+
+const PORT=process.env.PORT||3000;
+
+app.listen(PORT,()=>{
+
+    console.log("Server Running On Port "+PORT);
+
 });
