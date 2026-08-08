@@ -1,12 +1,18 @@
+const crypto = require("crypto");
+
 const db = require("../config/db");
 const { isExpired } = require("../utils/expiry");
+
+
+// ======================================================
+// ANDROID APP VERIFICATION
+// ======================================================
 
 exports.verify = async (req, res) => {
 
     try {
 
         const {
-
             api_key,
             package_name,
             android_id,
@@ -14,8 +20,12 @@ exports.verify = async (req, res) => {
             manufacturer,
             android_version,
             app_version
-
         } = req.body;
+
+
+        // ----------------------------------------------
+        // Required Parameters
+        // ----------------------------------------------
 
         if (!api_key || !package_name || !android_id) {
 
@@ -26,22 +36,26 @@ exports.verify = async (req, res) => {
 
         }
 
-        /*
-        ===============================
-        Check App
-        ===============================
-        */
+
+        // ----------------------------------------------
+        // Check App
+        // ----------------------------------------------
 
         const appResult = await db.query(
 
-            `SELECT * FROM apps
-            WHERE api_key=$1
-            AND package_name=$2
-            LIMIT 1`,
+            `SELECT *
+             FROM apps
+             WHERE api_key=$1
+             AND package_name=$2
+             LIMIT 1`,
 
-            [api_key, package_name]
+            [
+                api_key,
+                package_name
+            ]
 
         );
+
 
         if (appResult.rows.length === 0) {
 
@@ -52,7 +66,13 @@ exports.verify = async (req, res) => {
 
         }
 
+
         const app = appResult.rows[0];
+
+
+        // ----------------------------------------------
+        // App Status
+        // ----------------------------------------------
 
         if (!app.status) {
 
@@ -63,28 +83,30 @@ exports.verify = async (req, res) => {
 
         }
 
-        /*
-        ===============================
-        Check Device
-        ===============================
-        */
+
+        // ----------------------------------------------
+        // Check Device
+        // ----------------------------------------------
 
         const deviceResult = await db.query(
 
-            `SELECT * FROM devices
-            WHERE app_id=$1
-            AND android_id=$2
-            LIMIT 1`,
+            `SELECT *
+             FROM devices
+             WHERE app_id=$1
+             AND android_id=$2
+             LIMIT 1`,
 
-            [app.id, android_id]
+            [
+                app.id,
+                android_id
+            ]
 
         );
 
-        /*
-        ===============================
-        New Device
-        ===============================
-        */
+
+        // ----------------------------------------------
+        // New Device
+        // ----------------------------------------------
 
         if (deviceResult.rows.length === 0) {
 
@@ -98,28 +120,31 @@ exports.verify = async (req, res) => {
                     manufacturer,
                     android_version,
                     status,
-                    created_at
+                    created_at,
+                    updated_at
                 )
                 VALUES
                 (
-                    $1,$2,$3,$4,$5,'Pending',NOW()
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    $5,
+                    'Pending',
+                    NOW(),
+                    NOW()
                 )`,
 
                 [
-
                     app.id,
-
                     android_id,
-
-                    device_model,
-
-                    manufacturer,
-
-                    android_version
-
+                    device_model || null,
+                    manufacturer || null,
+                    android_version || null
                 ]
 
             );
+
 
             return res.json({
 
@@ -131,13 +156,13 @@ exports.verify = async (req, res) => {
 
         }
 
+
         const device = deviceResult.rows[0];
 
-        /*
-        ===============================
-        Blocked
-        ===============================
-        */
+
+        // ----------------------------------------------
+        // Blocked Device
+        // ----------------------------------------------
 
         if (device.status === "Blocked") {
 
@@ -151,11 +176,10 @@ exports.verify = async (req, res) => {
 
         }
 
-        /*
-        ===============================
-        Pending
-        ===============================
-        */
+
+        // ----------------------------------------------
+        // Pending Device
+        // ----------------------------------------------
 
         if (device.status === "Pending") {
 
@@ -169,11 +193,10 @@ exports.verify = async (req, res) => {
 
         }
 
-        /*
-        ===============================
-        Expired
-        ===============================
-        */
+
+        // ----------------------------------------------
+        // Expiry Check
+        // ----------------------------------------------
 
         if (device.active_until) {
 
@@ -191,33 +214,29 @@ exports.verify = async (req, res) => {
 
         }
 
-        /*
-        ===============================
-        Heartbeat
-        ===============================
-        */
+
+        // ----------------------------------------------
+        // Heartbeat
+        // ----------------------------------------------
 
         await db.query(
 
             `UPDATE devices
-            SET
-            last_seen=NOW(),
-            updated_at=NOW()
-            WHERE id=$1`,
+             SET
+                 last_seen=NOW(),
+                 updated_at=NOW()
+             WHERE id=$1`,
 
             [
-
                 device.id
-
             ]
 
         );
 
-        /*
-        ===============================
-        Success
-        ===============================
-        */
+
+        // ----------------------------------------------
+        // Verification Successful
+        // ----------------------------------------------
 
         return res.json({
 
@@ -237,15 +256,464 @@ exports.verify = async (req, res) => {
 
                 active_until: device.active_until,
 
-                app_version: app_version
+                app_version: app_version || app.version
 
             }
 
         });
 
+
     } catch (err) {
 
-        console.log(err);
+        console.error("VERIFY ERROR:", err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+};
+
+
+
+// ======================================================
+// GENERATE VERIFICATION CODE
+// POST /api/verify/generate
+// ======================================================
+
+exports.generateCode = async (req, res) => {
+
+    try {
+
+        const {
+            app_id,
+            code,
+            expiry_hours
+        } = req.body;
+
+
+        // ----------------------------------------------
+        // Validate App
+        // ----------------------------------------------
+
+        if (!app_id) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "App ID Required"
+
+            });
+
+        }
+
+
+        // ----------------------------------------------
+        // Validate Expiry
+        // ----------------------------------------------
+
+        const hours = Number(expiry_hours);
+
+        if (!Number.isFinite(hours) || hours <= 0) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Valid Expiry Hours Required"
+
+            });
+
+        }
+
+
+        // ----------------------------------------------
+        // Check App Exists
+        // ----------------------------------------------
+
+        const appResult = await db.query(
+
+            `SELECT id, app_name, package_name
+             FROM apps
+             WHERE id=$1
+             LIMIT 1`,
+
+            [
+                app_id
+            ]
+
+        );
+
+
+        if (appResult.rows.length === 0) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "App Not Found"
+
+            });
+
+        }
+
+
+        // ----------------------------------------------
+        // Generate Random Code
+        // ----------------------------------------------
+
+        let verificationCode;
+
+
+        if (code && String(code).trim() !== "") {
+
+            verificationCode = String(code)
+                .trim()
+                .toUpperCase()
+                .replace(/\s+/g, "-");
+
+        } else {
+
+            const part1 = crypto
+                .randomBytes(3)
+                .toString("hex")
+                .toUpperCase();
+
+            const part2 = crypto
+                .randomBytes(3)
+                .toString("hex")
+                .toUpperCase();
+
+            verificationCode = `AP-${part1}-${part2}`;
+
+        }
+
+
+        // ----------------------------------------------
+        // Check Duplicate Code
+        // ----------------------------------------------
+
+        const duplicate = await db.query(
+
+            `SELECT id
+             FROM verification_codes
+             WHERE code=$1
+             LIMIT 1`,
+
+            [
+                verificationCode
+            ]
+
+        );
+
+
+        if (duplicate.rows.length > 0) {
+
+            return res.status(409).json({
+
+                success: false,
+
+                message: "Code Already Exists"
+
+            });
+
+        }
+
+
+        // ----------------------------------------------
+        // Create Code
+        // ----------------------------------------------
+
+        const result = await db.query(
+
+            `INSERT INTO verification_codes
+            (
+                app_id,
+                code,
+                expiry_hours,
+                expires_at,
+                status,
+                created_at
+            )
+            VALUES
+            (
+                $1,
+                $2,
+                $3,
+                NOW() + ($3 * INTERVAL '1 hour'),
+                'Active',
+                NOW()
+            )
+            RETURNING *`,
+
+            [
+                app_id,
+                verificationCode,
+                hours
+            ]
+
+        );
+
+
+        // ----------------------------------------------
+        // Response
+        // ----------------------------------------------
+
+        return res.status(201).json({
+
+            success: true,
+
+            message: "Verification Code Generated",
+
+            data: {
+
+                ...result.rows[0],
+
+                app_name: appResult.rows[0].app_name,
+
+                package_name: appResult.rows[0].package_name
+
+            }
+
+        });
+
+
+    } catch (err) {
+
+        console.error("GENERATE CODE ERROR:", err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+};
+
+
+
+// ======================================================
+// GET ALL VERIFICATION CODES
+// GET /api/verify/all
+// ======================================================
+
+exports.getCodes = async (req, res) => {
+
+    try {
+
+        const result = await db.query(
+
+            `SELECT
+                vc.id,
+                vc.code,
+                vc.expiry_hours,
+                vc.expires_at,
+                vc.status,
+                vc.device_id,
+                vc.created_at,
+                vc.used_at,
+
+                a.app_name,
+                a.package_name
+
+             FROM verification_codes vc
+
+             LEFT JOIN apps a
+             ON a.id = vc.app_id
+
+             ORDER BY vc.id DESC`
+
+        );
+
+
+        // ----------------------------------------------
+        // Automatically mark expired codes
+        // ----------------------------------------------
+
+        const codes = result.rows.map((item) => {
+
+            let status = item.status;
+
+            if (
+                status === "Active" &&
+                item.expires_at &&
+                isExpired(item.expires_at)
+            ) {
+
+                status = "Expired";
+
+            }
+
+            return {
+                ...item,
+                status
+            };
+
+        });
+
+
+        return res.json({
+
+            success: true,
+
+            total: codes.length,
+
+            data: codes
+
+        });
+
+
+    } catch (err) {
+
+        console.error("GET CODES ERROR:", err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+};
+
+
+
+// ======================================================
+// DISABLE VERIFICATION CODE
+// POST /api/verify/disable/:id
+// ======================================================
+
+exports.disableCode = async (req, res) => {
+
+    try {
+
+        const id = req.params.id;
+
+
+        const result = await db.query(
+
+            `UPDATE verification_codes
+
+             SET status='Disabled'
+
+             WHERE id=$1
+
+             RETURNING *`,
+
+            [
+                id
+            ]
+
+        );
+
+
+        if (result.rows.length === 0) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Code Not Found"
+
+            });
+
+        }
+
+
+        return res.json({
+
+            success: true,
+
+            message: "Verification Code Disabled",
+
+            data: result.rows[0]
+
+        });
+
+
+    } catch (err) {
+
+        console.error("DISABLE CODE ERROR:", err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+};
+
+
+
+// ======================================================
+// DELETE VERIFICATION CODE
+// DELETE /api/verify/:id
+// ======================================================
+
+exports.deleteCode = async (req, res) => {
+
+    try {
+
+        const id = req.params.id;
+
+
+        const result = await db.query(
+
+            `DELETE FROM verification_codes
+
+             WHERE id=$1
+
+             RETURNING id`,
+
+            [
+                id
+            ]
+
+        );
+
+
+        if (result.rows.length === 0) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Code Not Found"
+
+            });
+
+        }
+
+
+        return res.json({
+
+            success: true,
+
+            message: "Verification Code Deleted"
+
+        });
+
+
+    } catch (err) {
+
+        console.error("DELETE CODE ERROR:", err);
 
         return res.status(500).json({
 
