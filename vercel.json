@@ -7,12 +7,19 @@
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
-          "login.html"
+          "login.html",
+          "dashboard.html"
         ]
       }
     },
+
     {
       "src": "login.html",
+      "use": "@vercel/static"
+    },
+
+    {
+      "src": "dashboard.html",
       "use": "@vercel/static"
     }
   ],
@@ -22,17 +29,25 @@
       "src": "/api/(.*)",
       "dest": "/server.js"
     },
+
     {
       "src": "/health",
       "dest": "/server.js"
     },
+
     {
       "src": "/",
       "dest": "/server.js"
     },
+
     {
       "src": "/login.html",
       "dest": "/login.html"
+    },
+
+    {
+      "src": "/dashboard.html",
+      "dest": "/dashboard.html"
     }
   ]
 }
