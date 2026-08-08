@@ -2,15 +2,12 @@ const db = require("../config/db");
 const { generateApiKey } = require("../utils/apiKey");
 
 /*
-=========================
-Add App
-=========================
+========================================
+ADD APP
+========================================
 */
-
 exports.addApp = async (req, res) => {
-
     try {
-
         const {
             app_name,
             package_name,
@@ -18,224 +15,152 @@ exports.addApp = async (req, res) => {
         } = req.body;
 
         if (!app_name || !package_name) {
-
-            return res.json({
+            return res.status(400).json({
                 success: false,
                 message: "App Name & Package Required"
             });
-
         }
 
+        // Check duplicate package
         const check = await db.query(
-
-            "SELECT id FROM apps WHERE package_name=$1",
-
+            "SELECT id FROM apps WHERE package_name=$1 LIMIT 1",
             [package_name]
-
         );
 
         if (check.rows.length > 0) {
-
-            return res.json({
-
+            return res.status(409).json({
                 success: false,
-
                 message: "Package Already Exists"
-
             });
-
         }
 
         const api_key = generateApiKey();
 
         const result = await db.query(
-
             `INSERT INTO apps
-            (app_name,package_name,api_key,version,status)
-            VALUES($1,$2,$3,$4,$5)
+            (app_name, package_name, api_key, version, status)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *`,
-
             [
-
                 app_name,
-
                 package_name,
-
                 api_key,
-
                 version || "1.0",
-
                 true
-
             ]
-
         );
 
-        res.json({
-
+        return res.status(201).json({
             success: true,
-
             message: "App Added",
-
             data: result.rows[0]
-
         });
 
-    }
+    } catch (err) {
+        console.error("ADD APP ERROR:", err);
 
-    catch (err) {
-
-        console.log(err);
-
-        res.status(500).json({
-
+        return res.status(500).json({
             success: false,
-
             message: "Server Error"
-
         });
-
     }
-
 };
 
 
 /*
-=========================
-All Apps
-=========================
+========================================
+GET ALL APPS
+========================================
 */
-
 exports.getApps = async (req, res) => {
-
     try {
-
         const result = await db.query(
-
             "SELECT * FROM apps ORDER BY id DESC"
-
         );
 
-        res.json({
-
+        return res.json({
             success: true,
-
             total: result.rows.length,
-
             data: result.rows
-
         });
 
-    }
+    } catch (err) {
+        console.error("GET APPS ERROR:", err);
 
-    catch (err) {
-
-        res.status(500).json({
-
+        return res.status(500).json({
             success: false,
-
             message: "Server Error"
-
         });
-
     }
-
 };
 
 
 /*
-=========================
-Single App
-=========================
+========================================
+GET SINGLE APP
+========================================
 */
-
 exports.getApp = async (req, res) => {
-
     try {
-
         const result = await db.query(
-
-            "SELECT * FROM apps WHERE id=$1",
-
+            "SELECT * FROM apps WHERE id=$1 LIMIT 1",
             [req.params.id]
-
         );
 
-        if (result.rows.length == 0) {
-
-            return res.json({
-
+        if (result.rows.length === 0) {
+            return res.status(404).json({
                 success: false,
-
                 message: "App Not Found"
-
             });
-
         }
 
-        res.json({
-
+        return res.json({
             success: true,
-
             data: result.rows[0]
-
         });
 
-    }
+    } catch (err) {
+        console.error("GET APP ERROR:", err);
 
-    catch {
-
-        res.status(500).json({
-
+        return res.status(500).json({
             success: false,
-
             message: "Server Error"
-
         });
-
     }
-
 };
 
 
 /*
-=========================
-Delete App
-=========================
+========================================
+DELETE APP
+========================================
 */
-
 exports.deleteApp = async (req, res) => {
-
     try {
-
-        await db.query(
-
-            "DELETE FROM apps WHERE id=$1",
-
+        const result = await db.query(
+            "DELETE FROM apps WHERE id=$1 RETURNING *",
             [req.params.id]
-
         );
 
-        res.json({
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "App Not Found"
+            });
+        }
 
+        return res.json({
             success: true,
-
-            message: "App Deleted"
-
+            message: "App Deleted",
+            data: result.rows[0]
         });
 
-    }
+    } catch (err) {
+        console.error("DELETE APP ERROR:", err);
 
-    catch {
-
-        res.status(500).json({
-
+        return res.status(500).json({
             success: false,
-
             message: "Server Error"
-
         });
-
     }
-
 };
